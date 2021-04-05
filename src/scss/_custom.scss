@@ -1,0 +1,32 @@
+// Here you can add other styles
+.buttons_inside_contract_list {
+  margin-right: 1%;
+  width: 40%;
+}
+
+.footer_contract_list_element {
+  width: 100%;
+}
+
+// .close_icon {
+//   float: right;
+//   padding-left: 1em;
+// }
+
+.friend_button {
+  // text-align: center;
+  // width: 280%;
+  position: inherit;
+  min-width: 270px;
+  margin-bottom: 5px;
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.align_center {
+  text-align: center;
+}
