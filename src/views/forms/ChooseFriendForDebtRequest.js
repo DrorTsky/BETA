@@ -63,14 +63,14 @@ export class ChooseFriendForDebtRequest extends Component {
           key={index}
           {...value}
           playerOne={this.props.playerOne}
-          playerTwo={this.props.playerTwo}
+          playerTwo={value.friendAddress}
           profile={this.props.profile}
         />
       );
     }
 
     const isFriendsListEmpty = this.state.friendsList.length;
-
+    console.log(this.state.allFriends);
     return (
       <div>
         <CCol xs="12" md="4">
