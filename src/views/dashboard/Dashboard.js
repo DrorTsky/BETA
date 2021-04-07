@@ -774,9 +774,9 @@ export class Dashboard extends Component {
               </CCardBody>
             </CCard>
           </CCol>
-        </CRow>
-        <CRow> */}
-        {/* <CCol xs="12" md="4" xl="4">
+        </CRow> */}
+        {/* <CRow>
+        <CCol xs="12" md="4" xl="4">
             <CCard>
               <CCardHeader>Contracts</CCardHeader>
               <CCardBody>
