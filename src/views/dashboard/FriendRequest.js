@@ -9,13 +9,23 @@ export class FriendRequest extends Component {
   }
 
   render() {
+    console.log(this);
+    let bodyMessage = "";
+    let topMessage = "";
+    if (this.props.playerOne === this.props.source) {
+      topMessage = "pending...";
+      bodyMessage = "waiting for " + this.props.destinationName + " to accept";
+    } else {
+      topMessage = "from: " + this.props.sourceName;
+      bodyMessage = this.props.sourceName + " sent you a friend request";
+    }
     return (
       <div>
         <CCard color="info" className="text-white text-center">
-          <CCardHeader>friend request</CCardHeader>
+          <CCardHeader>{topMessage}</CCardHeader>
           <CCardBody>
             <blockquote className="card-bodyquote">
-              <h3>from: {this.props.sourceName}</h3>
+              <h3>{bodyMessage}</h3>
               {this.props.creationDate}
             </blockquote>
 
