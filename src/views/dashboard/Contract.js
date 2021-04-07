@@ -8,6 +8,7 @@ import CIcon from "@coreui/icons-react";
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
+import AddIcon from "@material-ui/icons/Add";
 
 import TransactionLog from "./TransactionLog";
 import AddDebt from "../forms/AddDebt";
@@ -62,22 +63,42 @@ export class Contract extends Component {
         ? this.state.debtor
         : this.state.creditor;
 
-    let message =
-      this.state.typeOfCard === "danger" ? (
+    // let message =
+    //   this.state.typeOfCard === "danger" ? (
+    //     <CCardHeader>
+    //       <b>you owe</b> {headerName}
+    //     </CCardHeader>
+    //   ) : (
+    //     <CCardHeader>
+    //       {headerName}
+    //       <br /> <b>owes you</b>
+    //     </CCardHeader>
+    //   );
+    let message = "";
+    let cardTextStyle = "";
+    if (this.state.typeOfCard === "danger") {
+      cardTextStyle = "text-center red_text";
+      message = (
         <CCardHeader>
           <b>you owe</b> {headerName}
         </CCardHeader>
-      ) : (
+      );
+    } else {
+      cardTextStyle = "text-center green_text";
+      message = (
         <CCardHeader>
           {headerName}
           <br /> <b>owes you</b>
         </CCardHeader>
       );
+    }
 
     console.log(this);
     return (
       <div>
-        <CCard color={this.state.typeOfCard} className="text-white text-center">
+        {/* <CCard color={this.state.typeOfCard} className="text-white text-center"> */}
+        {/* <CCard className="text-white text-center"> */}
+        <CCard className={cardTextStyle}>
           {message}
           <CCardBody>
             <blockquote className="card-bodyquote">
@@ -86,7 +107,7 @@ export class Contract extends Component {
             <footer className="footer_contract_list_element">
               <CButton
                 size="sm"
-                color="secondary"
+                color="dark"
                 className="buttons_inside_contract_list"
                 onClick={this.handleOpenTransactionLog}
               >
@@ -118,11 +139,13 @@ export class Contract extends Component {
 
               <CButton
                 size="sm"
-                color="dark"
+                color="secondary"
                 className="buttons_inside_contract_list"
                 onClick={this.handleOpenAddDebt}
               >
-                <CIcon name="cil-ban" /> Add Debt
+                {/* <CIcon name="cil-note-add" /> */}
+                <AddIcon fontSize="small"></AddIcon>
+                Add Debt
               </CButton>
               <Dialog
                 open={this.state.openAddDebt}
