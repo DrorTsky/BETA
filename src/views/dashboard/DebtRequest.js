@@ -9,20 +9,14 @@ export class DebtRequest extends Component {
 
     this.state = {};
     this.confirmDebtRequest = this.confirmDebtRequest.bind(this);
+    this.declineDebtRequest = this.declineDebtRequest.bind(this);
   }
+
   confirmDebtRequest = async (event) => {
     event.preventDefault();
 
     // Getting accounts list
     const accounts = await web3.eth.getAccounts();
-
-    // Setting this.state.{playerOne, Two, amount} from the request details:
-    // let myExchanges = await this.props.profile.methods.getAllExchanges().call();
-    // let chosenRequest = this.props.exchange; // TODO: I use myExchanges[0] for testing only! The user will pick the correct one
-
-    // this.setState({ playerTwo: chosenRequest.transaction.from });
-    // this.setState({ playerOne: chosenRequest.transaction.to });
-    // this.setState({ providedAmount: chosenRequest.transaction.amount });
 
     let myContracts = await this.props.profile.methods.getContracts().call();
 
@@ -138,8 +132,28 @@ export class DebtRequest extends Component {
     }
   };
 
+  declineDebtRequest = async (event) => {
+    event.preventDefault();
+
+    //getting users account
+    const accounts = await web3.eth.getAccounts();
+
+    //testing which address is not the user
+    let friendsAddress =
+      this.props.destination === this.props.playerOne
+        ? this.props.source
+        : this.props.destination;
+    //getting other participants profile
+    const friendsProfile = new web3.eth.Contract(profileAbi, friendsAddress);
+
+    // TODO waiting for omer to make a function that removes an exchange by creationTime
+    // makeBatchRequest([
+
+    // ])
+  };
+
   render() {
-    // console.log(this);
+    console.log(this);
     let bodyMessage = "";
     let topMessage = "";
     if (this.props.playerOne === this.props.source) {
