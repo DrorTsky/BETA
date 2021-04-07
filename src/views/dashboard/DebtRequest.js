@@ -139,13 +139,58 @@ export class DebtRequest extends Component {
     const accounts = await web3.eth.getAccounts();
 
     //testing which address is not the user
-    let friendsAddress =
-      this.props.destination === this.props.playerOne
-        ? this.props.source
-        : this.props.destination;
+    const friendsAddress =
+      this.props.exchange.transaction.from === this.props.playerOne
+        ? this.props.exchange.transaction.to
+        : this.props.exchange.transaction.from;
     //getting other participants profile
     const friendsProfile = new web3.eth.Contract(profileAbi, friendsAddress);
 
+    //find the right friend exchange index
+    let friendsExchangeIndex = -1;
+    const friendsExchanges = await friendsProfile.methods
+      .getAllExchanges()
+      .call();
+    const length = friendsExchanges.length;
+    if (length > 0) {
+      for (var friendsIndex = 0; friendsIndex < length; friendsIndex++) {
+        let exchange = await friendsProfile.methods
+          .getAllExchangesByIndex(friendsIndex)
+          .call();
+        if (
+          exchange.exchangePurpose === this.props.exchange.exchangePurpose &&
+          exchange.transaction.date === this.props.exchange.transaction.date
+        ) {
+          friendsExchangeIndex = friendsIndex;
+        }
+      }
+
+      // BATCH
+      // if (friendsExchangeIndex !== -1) {
+      makeBatchRequest([
+        // remove both of the exchanges in a batch request.
+        friendsProfile.methods.removeExchange(friendsExchangeIndex).send,
+        this.props.profile.methods.removeExchange(this.props.index).send,
+      ]);
+      // }
+      function makeBatchRequest(calls) {
+        let batch = new web3.BatchRequest();
+
+        calls.map((call) => {
+          return new Promise((res, rej) => {
+            let req = call.request(
+              { from: accounts[0], gas: "2000000" },
+              (err, data) => {
+                if (err) rej(err);
+                else res(data);
+              }
+            );
+            batch.add(req);
+          });
+        });
+        batch.execute();
+      }
+    }
     // TODO waiting for omer to make a function that removes an exchange by creationTime
     // makeBatchRequest([
 
@@ -189,7 +234,7 @@ export class DebtRequest extends Component {
                 size="sm"
                 color="dark"
                 className="buttons_inside_contract_list"
-                //   onClick={this.handleOpenAddDebt}
+                onClick={this.declineDebtRequest}
               >
                 refuse
               </CButton>
