@@ -179,6 +179,56 @@ const profileAbi = [
     type: "function",
   },
   {
+    constant: true,
+    inputs: [{ name: "index", type: "uint256" }],
+    name: "getAllExchangesByIndex",
+    outputs: [
+      {
+        components: [
+          {
+            components: [
+              { name: "exchangeId", type: "uint256" },
+              { name: "source", type: "address" },
+              { name: "sourceName", type: "string" },
+              { name: "destination", type: "address" },
+              { name: "destinationName", type: "string" },
+              { name: "creationDate", type: "uint256" },
+            ],
+            name: "exchangeDetails",
+            type: "tuple",
+          },
+          { name: "exchangePurpose", type: "uint8" },
+          {
+            components: [
+              { name: "from", type: "address" },
+              { name: "to", type: "address" },
+              { name: "amount", type: "uint256" },
+              { name: "date", type: "uint256" },
+            ],
+            name: "transaction",
+            type: "tuple",
+          },
+          {
+            components: [
+              { name: "debtor", type: "address" },
+              { name: "mediator", type: "address" },
+              { name: "creditor", type: "address" },
+              { name: "status", type: "uint8" },
+              { name: "amount", type: "uint256" },
+            ],
+            name: "debtRotation",
+            type: "tuple",
+          },
+        ],
+        name: "",
+        type: "tuple",
+      },
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     constant: false,
     inputs: [
       { name: "debtExchangeIndex", type: "uint256" },
@@ -302,6 +352,24 @@ const profileAbi = [
     type: "function",
   },
   {
+    constant: true,
+    inputs: [{ name: "index", type: "uint256" }],
+    name: "getFriendsByIndex",
+    outputs: [
+      {
+        components: [
+          { name: "friendAddress", type: "address" },
+          { name: "friendName", type: "string" },
+        ],
+        name: "",
+        type: "tuple",
+      },
+    ],
+    payable: false,
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     constant: false,
     inputs: [
       { name: "sender", type: "address" },
@@ -388,6 +456,15 @@ const profileAbi = [
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    constant: true,
+    inputs: [{ name: "index", type: "uint256" }],
+    name: "getContractsByIndex",
+    outputs: [{ name: "", type: "address" }],
+    payable: false,
+    stateMutability: "view",
     type: "function",
   },
   {

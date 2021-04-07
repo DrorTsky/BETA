@@ -295,11 +295,11 @@ contract ProfileContract{
         return contracts;
     }
 
-    function getContractsByIndex(uint index) public view returns (address){
+    function getContractsByIndex(uint index) public view returns (address memory){
         return contracts[index];
     }
 
-        // For testing only!!!!!!!!!
+    // For testing only!!!!!!!!!
     function removeContracts() public {
         delete contracts;
     }
