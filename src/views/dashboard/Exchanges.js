@@ -52,6 +52,17 @@ export class Exchanges extends Component {
 
   render() {
     // console.log(this);
+    // for (const [index, value] of Object.entries(
+    //   this.state.allTransactions
+    // )) {
+    //   items.push(
+    //     <Transaction
+    //       key={index}
+    //       myAddress={this.props.myAddress}
+    //       {...value}
+    //     />
+    //   );
+    // }
     const allExchanges = [];
     for (const exchange of Object.entries(this.state.allExchanges)) {
       try {
@@ -71,6 +82,7 @@ export class Exchanges extends Component {
               profile={this.props.profile}
               compiledBinaryContract={this.props.compiledBinaryContract}
               playerOne={this.props.playerOne}
+              index={exchange[0]}
             />
           );
         }
