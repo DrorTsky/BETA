@@ -84,7 +84,7 @@ export class Dashboard extends Component {
     if (typeof ethereum !== "undefined") {
       await ethereum.enable();
     }
-    this.onCheckMyExchanges();
+    // this.onCheckMyExchanges();
     this.onCheckMyContracts();
     this.onCheckMyFriends();
     // console.log(this.props);
@@ -609,7 +609,7 @@ export class Dashboard extends Component {
             />
           </CCol>
         </CRow>
-        <CRow>
+        {/* <CRow>
           <CCol xs="12" md="4">
             <AddFriend
               playerOne={this.state.address}
@@ -658,8 +658,8 @@ export class Dashboard extends Component {
               </CForm>
             </CCard>
           </CCol>
-        </CRow>
-        <CRow>
+        </CRow> */}
+        {/* <CRow>
           <CCol xs="12" md="6" xl="6">
             <CCard>
               <CCardHeader>Friends List</CCardHeader>
@@ -673,16 +673,6 @@ export class Dashboard extends Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {/* {this.state.friendsList.map((friend) => (
-                        <tr key={friend}>
-                          <td>
-                            <div>{friend.friendAddress}</div>
-                          </td>
-                          <td>
-                            <div>{friend.friendName}</div>
-                          </td>
-                        </tr>
-                      ))} */}
                     </tbody>
                   </table>
                 </div>
@@ -707,8 +697,8 @@ export class Dashboard extends Component {
               </CCardFooter>
             </CCard>
           </CCol>
-        </CRow>
-        <CRow>
+        </CRow> */}
+        {/* <CRow>
           <CCol xs="12" sm="4">
             <AddDebt
               playerOne={this.state.playerOne}
@@ -785,8 +775,8 @@ export class Dashboard extends Component {
             </CCard>
           </CCol>
         </CRow>
-        <CRow>
-          <CCol xs="12" md="4" xl="4">
+        <CRow> */}
+        {/* <CCol xs="12" md="4" xl="4">
             <CCard>
               <CCardHeader>Contracts</CCardHeader>
               <CCardBody>
@@ -882,7 +872,7 @@ export class Dashboard extends Component {
               </CCardFooter>
             </CCard>
           </CCol>
-        </CRow>
+        </CRow> */}
       </>
     );
   }

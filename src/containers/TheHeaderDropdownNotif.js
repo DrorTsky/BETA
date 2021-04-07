@@ -74,27 +74,57 @@ export class TheHeaderDropdownNotif extends Component {
   };
 
   render() {
-    let badges;
+    let plural =
+      this.state.totalRequests === 1 ? "notification" : "notifications";
 
-    if (this.state.totalRequests === 0) {
-      badges = <CBadge></CBadge>;
-    } else {
-      badges = (
+    // console.log(this);
+
+    let totalBadge, friendBadge, debtBadge, rotationBadge;
+    let sumFriendRequests = 0;
+    let sumDebtRequests = 0;
+    let sumRotationRequests = 0;
+
+    for (const exchange of Object.entries(this.state.exchanges)) {
+      try {
+        // console.log(exchange[1]);
+        if (exchange[1].exchangePurpose === "0") sumFriendRequests += 1;
+        else if (exchange[1].exchangePurpose === "1") sumDebtRequests += 1;
+        else if (exchange[1].exchangePurpose === "2") sumRotationRequests += 1;
+      } catch {
+        console.log("failed to load exchangeDetails");
+      }
+    }
+
+    totalBadge =
+      this.state.totalRequests === 0 ? null : (
         <CBadge shape="pill" color="danger">
           {this.state.totalRequests}
         </CBadge>
       );
-    }
+    friendBadge =
+      sumFriendRequests === 0 ? null : (
+        <CBadge shape="pill" color="danger">
+          {sumFriendRequests}
+        </CBadge>
+      );
+    debtBadge =
+      sumDebtRequests === 0 ? null : (
+        <CBadge shape="pill" color="danger">
+          {sumDebtRequests}
+        </CBadge>
+      );
+    rotationBadge =
+      sumRotationRequests === 0 ? null : (
+        <CBadge shape="pill" color="danger">
+          {sumRotationRequests}
+        </CBadge>
+      );
 
-    let plural =
-      this.state.totalRequests === 1 ? "notification" : "notifications";
-    console.log(this);
-    const itemsCount = 5;
     return (
       <CDropdown inNav className="c-header-nav-item mx-2">
         <CDropdownToggle className="c-header-nav-link" caret={false}>
           <CIcon name="cil-bell" />
-          {badges}
+          {totalBadge}
         </CDropdownToggle>
         <CDropdownMenu placement="bottom-end" className="pt-0">
           <CDropdownItem header tag="div" className="text-center" color="light">
@@ -116,7 +146,7 @@ export class TheHeaderDropdownNotif extends Component {
               to={{
                 pathname: "/friend_requests",
                 requestProps: {
-                  setRequests: this.setFriendRequests,
+                  compiledBinaryContract: this.props.compiledBinaryContract,
                 },
               }}
               className="text-success"
@@ -124,27 +154,33 @@ export class TheHeaderDropdownNotif extends Component {
               <CIcon name="cil-user-follow" className="mr-2 text-success" />
               Friend Request
             </CLink>
+            <CBadge color="danger" className="mfs-auto">
+              {friendBadge}
+            </CBadge>
           </CDropdownItem>
           <CDropdownItem>
             <CLink
               to={{
                 pathname: "/debt_requests",
                 requestProps: {
-                  setRequests: this.setDebtRequests,
+                  compiledBinaryContract: this.props.compiledBinaryContract,
                 },
               }}
               className="text-info"
             >
-              <CIcon name="cil-chart-pie" className="mr-2 text-info" /> Exchange
-              request
+              <CIcon name="cil-chart-pie" className="mfe-2 mr-2 text-info" />{" "}
+              Exchange request
             </CLink>
+            <CBadge color="danger" className="mfs-auto">
+              {debtBadge}
+            </CBadge>
           </CDropdownItem>
           <CDropdownItem>
             <CLink
               to={{
                 pathname: "/rotation_requests",
                 requestProps: {
-                  setRequests: this.setRotationRequests,
+                  compiledBinaryContract: this.props.compiledBinaryContract,
                 },
               }}
               className="text-primary"
@@ -152,6 +188,9 @@ export class TheHeaderDropdownNotif extends Component {
               <CIcon name="cil-arrow-right" className="mr-2 text-primary" />
               Rotation request
             </CLink>
+            <CBadge color="danger" className="mfs-auto">
+              {rotationBadge}
+            </CBadge>
           </CDropdownItem>
         </CDropdownMenu>
       </CDropdown>

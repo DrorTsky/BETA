@@ -21,6 +21,7 @@ export class Exchanges extends Component {
       exchanges: await this.state.profile.methods.getAllExchanges().call(),
     });
   };
+
   async componentDidMount() {
     if (
       (await this.state.profile.methods.getAllExchanges().call())[0] !==
@@ -36,6 +37,7 @@ export class Exchanges extends Component {
   }
 
   render() {
+    console.log(this);
     const allExchanges = [];
     for (const exchange of Object.entries(this.state.exchanges)) {
       try {
@@ -49,6 +51,9 @@ export class Exchanges extends Component {
               sourceName={exchange[1].exchangeDetails.sourceName}
               creationDate={exchange[1].exchangeDetails.creationDate}
               amount={exchange[1].transaction.amount}
+              exchange={exchange[1]}
+              profile={this.props.profile}
+              compiledBinaryContract={this.props.compiledBinaryContract}
             />
           );
         }
@@ -56,7 +61,6 @@ export class Exchanges extends Component {
         console.log("failed to load exchangeDetails");
       }
     }
-    this.props.setRequests(allExchanges.length);
     const isAllExchangesEmpty = allExchanges.length;
 
     return (

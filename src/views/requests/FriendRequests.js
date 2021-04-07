@@ -11,11 +11,7 @@ export class FriendRequests extends Component {
   render() {
     return (
       <div>
-        <Exchanges
-          type="2"
-          profile={this.props.profile}
-          {...this.props.location.requestProps}
-        />
+        <Exchanges type="2" profile={this.props.profile} {...this.props} />
       </div>
     );
   }

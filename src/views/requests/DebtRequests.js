@@ -9,13 +9,10 @@ export class DebtRequests extends Component {
   }
 
   render() {
+    console.log(this);
     return (
       <div>
-        <Exchanges
-          type="1"
-          profile={this.props.profile}
-          {...this.props.location.requestProps}
-        />
+        <Exchanges type="1" profile={this.props.profile} {...this.props} />
       </div>
     );
   }
