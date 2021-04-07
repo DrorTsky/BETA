@@ -124,11 +124,21 @@ export class AddFriend extends Component {
                 </CCol>
               </CFormGroup>
             </CCardBody>
-            <CCardFooter>
-              <CButton type="submit" size="sm" color="success">
+            <CCardFooter className="footer_contract_list_element align_center">
+              <CButton
+                type="submit"
+                size="sm"
+                color="success"
+                className="buttons_inside_contract_list"
+              >
                 <CIcon name="cil-scrubber" /> Submit
               </CButton>
-              <CButton type="reset" size="sm" color="danger">
+              <CButton
+                type="reset"
+                size="sm"
+                color="danger"
+                className="buttons_inside_contract_list"
+              >
                 <CIcon name="cil-ban" /> Reset
               </CButton>
             </CCardFooter>
