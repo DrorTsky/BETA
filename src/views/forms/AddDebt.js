@@ -22,10 +22,10 @@ export class AddDebt extends Component {
     super(props);
 
     this.state = {
-      friendsAddress: this.props.friendAddress,
-      friendRequestIndex: "",
+      // friendsAddress: this.props.friendAddress,
+      // friendRequestIndex: "",
       providedAmount: "",
-      playerTwo: this.props.playerTwo,
+      playerTwo: this.props.friendAddress,
       // friendsList: [],
       // exchanges: {},
       contractsList: [],
@@ -49,23 +49,23 @@ export class AddDebt extends Component {
     // Getting a reference to a friendsProfile - NOTE: it will work only if the user provided us friendsProfile address
     const friendsProfile = new web3.eth.Contract(
       profileAbi,
-      this.props.playerTwo
+      this.props.friendAddress
     );
 
     makeBatchRequest([
       // add both of the exchanges in a batch request.
       // the difference: addDebtRequest(destination, same other args), addDebtRequestNotRestricted(source, same other args)
       this.props.profile.methods.addDebtRequest(
-        this.props.playerTwo,
+        this.props.friendAddress,
         this.props.playerOne,
         this.state.providedAmount,
-        this.props.playerTwo
+        this.props.friendAddress
       ).send,
       friendsProfile.methods.addDebtRequestNotRestricted(
         this.props.playerOne,
         this.props.playerOne,
         this.state.providedAmount,
-        this.props.playerTwo
+        this.props.friendAddress
       ).send,
     ]);
 
@@ -104,6 +104,7 @@ export class AddDebt extends Component {
     this.setState({ [name]: value });
   }
   render() {
+    console.log(this);
     return (
       <div>
         <CCard>
@@ -114,7 +115,7 @@ export class AddDebt extends Component {
               method="post"
               onSubmit={this.onSubmitAddDebtRequest}
             >
-              <CFormGroup>
+              {/* <CFormGroup>
                 <CInputGroup>
                   <CInput
                     id="toDebtRequest"
@@ -130,7 +131,7 @@ export class AddDebt extends Component {
                     </CInputGroupText>
                   </CInputGroupAppend>
                 </CInputGroup>
-              </CFormGroup>
+              </CFormGroup> */}
               <CFormGroup>
                 <CInputGroup>
                   <CInput

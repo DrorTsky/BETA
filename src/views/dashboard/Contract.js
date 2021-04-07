@@ -74,6 +74,7 @@ export class Contract extends Component {
         </CCardHeader>
       );
 
+    console.log(this);
     return (
       <div>
         <CCard color={this.state.typeOfCard} className="text-white text-center">
@@ -128,11 +129,12 @@ export class Contract extends Component {
                 onClose={this.handleCloseAddDebt}
                 aria-labelledby="form-dialog-title"
               >
-                <DialogTitle id="form-dialog-title">
-                  All transactions
-                </DialogTitle>
+                <DialogTitle id="form-dialog-title">Sum you gave</DialogTitle>
                 <DialogContent>
-                  <AddDebt />
+                  <AddDebt
+                    {...this.props}
+                    friendAddress={this.props.playerTwo}
+                  />
                 </DialogContent>
               </Dialog>
             </footer>

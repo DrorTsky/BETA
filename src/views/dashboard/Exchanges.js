@@ -51,7 +51,7 @@ export class Exchanges extends Component {
   }
 
   render() {
-    console.log(this);
+    // console.log(this);
     const allExchanges = [];
     for (const exchange of Object.entries(this.state.allExchanges)) {
       try {

@@ -77,10 +77,16 @@ export class AllContracts extends Component {
   }
 
   render() {
+    // console.log(this);
     const items = [];
     for (const [index, value] of Object.entries(this.state.listInformation)) {
       items.push(
-        <Contract key={index} myName={this.props.playerOne} {...value} />
+        <Contract
+          key={index}
+          myName={this.props.playerOne}
+          {...this.props}
+          {...value}
+        />
       );
     }
 

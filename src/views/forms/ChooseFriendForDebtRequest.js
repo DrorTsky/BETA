@@ -63,7 +63,7 @@ export class ChooseFriendForDebtRequest extends Component {
           key={index}
           {...value}
           playerOne={this.props.playerOne}
-          playerTwo={value.friendAddress}
+          friendAddress={value.friendAddress}
           profile={this.props.profile}
         />
       );

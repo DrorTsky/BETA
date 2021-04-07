@@ -36,3 +36,7 @@
   display: flex;
   // align-self: flex-start;
 }
+
+.scrollable {
+  overflow-y: auto;
+}

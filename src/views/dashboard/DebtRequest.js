@@ -139,7 +139,7 @@ export class DebtRequest extends Component {
   };
 
   render() {
-    console.log(this);
+    // console.log(this);
     let bodyMessage = "";
     let topMessage = "";
     if (this.props.playerOne === this.props.source) {

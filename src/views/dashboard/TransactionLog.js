@@ -23,7 +23,7 @@ export class TransactionLog extends Component {
     return (
       <div>
         <CCard>
-          <CCardBody>
+          <CCardBody className="scrollable">
             <CListGroup accent>{items}</CListGroup>
           </CCardBody>
         </CCard>
