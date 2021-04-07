@@ -9,6 +9,7 @@ export class AllContracts extends Component {
 
     this.state = {
       contractsList: [],
+      allContracts: [],
       listInformation: {},
     };
     this.onCheckMyContracts = this.onCheckMyContracts.bind(this);
@@ -21,6 +22,18 @@ export class AllContracts extends Component {
     this.setState({
       contractsList: await this.props.profile.methods.getContracts().call(),
     });
+    const length = this.state.contractsList.length;
+
+    if (length > 0) {
+      for (var index = 0; index < length; index++) {
+        this.setState({
+          allContracts: [
+            ...this.state.allContracts,
+            await this.props.profile.methods.getContractsByIndex(index).call(),
+          ],
+        });
+      }
+    }
     var x = 0;
     for (x in this.state.contractsList) {
       let tempC = await new web3.eth.Contract(
