@@ -16,6 +16,7 @@ export class TheHeaderDropdownNotif extends Component {
 
     this.state = {
       exchanges: [],
+      allExchanges: [],
       totalRequests: 0,
       friendRequests: 0,
       debtRequests: 0,
@@ -26,7 +27,9 @@ export class TheHeaderDropdownNotif extends Component {
     this.setFriendRequests = this.setFriendRequests.bind(this);
     this.setDebtRequests = this.setDebtRequests.bind(this);
     this.setRotationRequests = this.setRotationRequests.bind(this);
-    this.displayRequests = this.displayRequests.bind(this);
+    this.setStateAndAmountOfExchanges = this.setStateAndAmountOfExchanges.bind(
+      this
+    );
   }
 
   async componentDidMount() {
@@ -39,17 +42,29 @@ export class TheHeaderDropdownNotif extends Component {
         (exchange = (
           await this.props.profile.methods.getAllExchanges().call()
         )[0].transaction)
-      ).then(this.displayRequests());
+      ).then(this.setStateAndAmountOfExchanges());
     }
   }
 
-  displayRequests = async () => {
+  setStateAndAmountOfExchanges = async () => {
     this.setState({
       exchanges: await this.props.profile.methods.getAllExchanges().call(),
     });
     this.setState({
       totalRequests: this.state.exchanges.length,
     });
+    if (this.state.totalRequests > 0) {
+      for (var index = 0; index < this.state.totalRequests; index++) {
+        this.setState({
+          allExchanges: [
+            ...this.state.allExchanges,
+            await this.props.profile.methods
+              .getAllExchangesByIndex(index)
+              .call(),
+          ],
+        });
+      }
+    }
   };
 
   setTotalRequests = () => {
@@ -84,7 +99,7 @@ export class TheHeaderDropdownNotif extends Component {
     let sumDebtRequests = 0;
     let sumRotationRequests = 0;
 
-    for (const exchange of Object.entries(this.state.exchanges)) {
+    for (const exchange of Object.entries(this.state.allExchanges)) {
       try {
         // console.log(exchange[1]);
         if (exchange[1].exchangePurpose === "0") sumFriendRequests += 1;
