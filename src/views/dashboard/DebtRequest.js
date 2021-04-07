@@ -7,13 +7,10 @@ export class DebtRequest extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      playerOne: "",
-      playerTwo: "",
-      providedAmount: "",
-    };
+    this.state = {};
+    this.confirmDebtRequest = this.confirmDebtRequest.bind(this);
   }
-  onSubmitConfirmDebtRequest = async (event) => {
+  confirmDebtRequest = async (event) => {
     event.preventDefault();
 
     // Getting accounts list
@@ -21,11 +18,11 @@ export class DebtRequest extends Component {
 
     // Setting this.state.{playerOne, Two, amount} from the request details:
     // let myExchanges = await this.props.profile.methods.getAllExchanges().call();
-    let chosenRequest = this.props.exchange; // TODO: I use myExchanges[0] for testing only! The user will pick the correct one
+    // let chosenRequest = this.props.exchange; // TODO: I use myExchanges[0] for testing only! The user will pick the correct one
 
-    this.setState({ playerTwo: chosenRequest.transaction.from });
-    this.setState({ playerOne: chosenRequest.transaction.to });
-    this.setState({ providedAmount: chosenRequest.transaction.amount });
+    // this.setState({ playerTwo: chosenRequest.transaction.from });
+    // this.setState({ playerOne: chosenRequest.transaction.to });
+    // this.setState({ providedAmount: chosenRequest.transaction.amount });
 
     let myContracts = await this.props.profile.methods.getContracts().call();
 
@@ -43,7 +40,7 @@ export class DebtRequest extends Component {
       let currentDebtOfCurrentBinaryContract = await currentBinaryContract.methods
         .getCurrentDebt()
         .call();
-      let accountsOfTransaction = [this.state.playerOne, this.state.playerTwo];
+      let accountsOfTransaction = [this.props.destination, this.props.source];
 
       if (
         accountsOfTransaction.includes(
@@ -57,9 +54,9 @@ export class DebtRequest extends Component {
 
         await currentBinaryContract.methods
           .addTransaction(
-            this.state.playerOne,
-            this.state.providedAmount,
-            this.state.playerTwo
+            this.props.destination,
+            this.props.amount,
+            this.props.source
           )
           .send({
             from: accounts[0],
@@ -76,9 +73,9 @@ export class DebtRequest extends Component {
       // deploy a binaryContract
       await this.state.profile.methods
         .createBinaryContract(
-          this.state.playerOne,
-          this.state.providedAmount,
-          this.state.playerTwo
+          this.props.destination,
+          this.props.amount,
+          this.props.source
         )
         .send({
           from: accounts[0],
@@ -87,7 +84,7 @@ export class DebtRequest extends Component {
 
       console.log("Binary contract was created successfully!");
 
-      deployedContractAddress = await this.state.profile.methods
+      deployedContractAddress = await this.props.profile.methods
         .getLastContract()
         .call();
     }
@@ -96,18 +93,15 @@ export class DebtRequest extends Component {
       ? existedContractAddress
       : deployedContractAddress;
     let currentBinaryContract = await new web3.eth.Contract(
-      JSON.parse(this.state.compiledBinaryContract.interface),
+      JSON.parse(this.props.compiledBinaryContract.interface),
       currentBinaryContractAddress
     );
 
-    let friendsProfile = new web3.eth.Contract(
-      profileAbi,
-      this.state.playerTwo
-    );
+    let friendsProfile = new web3.eth.Contract(profileAbi, this.props.source);
 
     // we assign a zeroAddress if the contract already existed. Otherwise, the deployed contract address
     let newContractAddress = contractExisted
-      ? await this.state.profile.methods.getZeroAddress().call()
+      ? await this.props.profile.methods.getZeroAddress().call()
       : deployedContractAddress;
 
     makeBatchRequest([
@@ -115,7 +109,7 @@ export class DebtRequest extends Component {
 
       // We call this method in order to remove our exchange on the profile (solidity)
       // TODO: when implementing it with the actual frontend, we should send the actual index instead of "0"
-      this.state.profile.methods.confirmDebtRequest(0).send,
+      this.props.profile.methods.confirmDebtRequest(0).send,
 
       // We call this method in order to remove friend's exchange (solidity method)
       // TODO: when implementing it with the actual frontend, we should send the actual index instead of "0"
@@ -146,14 +140,23 @@ export class DebtRequest extends Component {
 
   render() {
     console.log(this);
+    let bodyMessage = "";
+    let topMessage = "";
+    if (this.props.playerOne === this.props.source) {
+      topMessage = "pending...";
+      bodyMessage = "you sent " + this.props.destination;
+    } else {
+      topMessage = "from: " + this.props.sourceName;
+      bodyMessage = this.props.sourceName + " payed you: " + this.props.amount;
+    }
     return (
       <div>
         <CCard color="info" className="text-white text-center">
-          <CCardHeader>from: {this.props.sourceName}</CCardHeader>
+          <CCardHeader>{topMessage}</CCardHeader>
           <CCardBody>
             <blockquote className="card-bodyquote">
               <h3>
-                {this.props.sourceName} payed you: {this.props.amount} <br />
+                {bodyMessage} <br />
               </h3>
               {this.props.creationDate}
             </blockquote>
@@ -163,7 +166,7 @@ export class DebtRequest extends Component {
                 size="sm"
                 color="secondary"
                 className="buttons_inside_contract_list"
-                //   onClick={this.handleOpenAddDebt}
+                onClick={this.confirmDebtRequest}
               >
                 accept
               </CButton>

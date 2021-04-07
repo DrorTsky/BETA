@@ -48,12 +48,14 @@ export class Exchanges extends Component {
               key={exchange[1].exchangeDetails.exchangeId}
               exchangePurpose={exchange[1].exchangePurpose}
               source={exchange[1].exchangeDetails.source}
+              destination={exchange[1].exchangeDetails.destination}
               sourceName={exchange[1].exchangeDetails.sourceName}
               creationDate={exchange[1].exchangeDetails.creationDate}
               amount={exchange[1].transaction.amount}
               exchange={exchange[1]}
               profile={this.props.profile}
               compiledBinaryContract={this.props.compiledBinaryContract}
+              playerOne={this.props.playerOne}
             />
           );
         }
