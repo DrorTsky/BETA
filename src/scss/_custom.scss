@@ -30,3 +30,9 @@
 .align_center {
   text-align: center;
 }
+
+.right_most {
+  position: relative;
+  display: flex;
+  // align-self: flex-start;
+}

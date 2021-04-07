@@ -1,14 +1,151 @@
 import React, { Component } from "react";
 import { CButton, CCard, CCardBody, CCardHeader } from "@coreui/react";
+import web3 from "../../web3.js";
+import profileAbi from "../../profile";
 
 export class DebtRequest extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      playerOne: "",
+      playerTwo: "",
+      providedAmount: "",
+    };
   }
+  onSubmitConfirmDebtRequest = async (event) => {
+    event.preventDefault();
+
+    // Getting accounts list
+    const accounts = await web3.eth.getAccounts();
+
+    // Setting this.state.{playerOne, Two, amount} from the request details:
+    // let myExchanges = await this.props.profile.methods.getAllExchanges().call();
+    let chosenRequest = this.props.exchange; // TODO: I use myExchanges[0] for testing only! The user will pick the correct one
+
+    this.setState({ playerTwo: chosenRequest.transaction.from });
+    this.setState({ playerOne: chosenRequest.transaction.to });
+    this.setState({ providedAmount: chosenRequest.transaction.amount });
+
+    let myContracts = await this.props.profile.methods.getContracts().call();
+
+    let existedContractAddress; // if a contract will be deployed, we will use this variable. Otherwise, we will use deployedContractAddress
+    let deployedContractAddress;
+    let contractExisted = false;
+
+    for (var i = 0; i < myContracts.length; i++) {
+      // in this for loop we try to find if a contract exist, or we should create one
+      let currentBinaryContract = await new web3.eth.Contract(
+        JSON.parse(this.props.compiledBinaryContract.interface),
+        (existedContractAddress = myContracts[i])
+      );
+
+      let currentDebtOfCurrentBinaryContract = await currentBinaryContract.methods
+        .getCurrentDebt()
+        .call();
+      let accountsOfTransaction = [this.state.playerOne, this.state.playerTwo];
+
+      if (
+        accountsOfTransaction.includes(
+          String(currentDebtOfCurrentBinaryContract.debtor)
+        ) &&
+        accountsOfTransaction.includes(
+          String(currentDebtOfCurrentBinaryContract.creditor)
+        )
+      ) {
+        // it means that the contract already exist
+
+        await currentBinaryContract.methods
+          .addTransaction(
+            this.state.playerOne,
+            this.state.providedAmount,
+            this.state.playerTwo
+          )
+          .send({
+            from: accounts[0],
+            gas: "2000000",
+          });
+
+        contractExisted = true;
+
+        break;
+      }
+    } // end of for loop - now we know if the contract existed or not
+
+    if (!contractExisted) {
+      // deploy a binaryContract
+      await this.state.profile.methods
+        .createBinaryContract(
+          this.state.playerOne,
+          this.state.providedAmount,
+          this.state.playerTwo
+        )
+        .send({
+          from: accounts[0],
+          gas: "4000000",
+        });
+
+      console.log("Binary contract was created successfully!");
+
+      deployedContractAddress = await this.state.profile.methods
+        .getLastContract()
+        .call();
+    }
+
+    let currentBinaryContractAddress = contractExisted
+      ? existedContractAddress
+      : deployedContractAddress;
+    let currentBinaryContract = await new web3.eth.Contract(
+      JSON.parse(this.state.compiledBinaryContract.interface),
+      currentBinaryContractAddress
+    );
+
+    let friendsProfile = new web3.eth.Contract(
+      profileAbi,
+      this.state.playerTwo
+    );
+
+    // we assign a zeroAddress if the contract already existed. Otherwise, the deployed contract address
+    let newContractAddress = contractExisted
+      ? await this.state.profile.methods.getZeroAddress().call()
+      : deployedContractAddress;
+
+    makeBatchRequest([
+      // remove both of the exchanges in a batch request.
+
+      // We call this method in order to remove our exchange on the profile (solidity)
+      // TODO: when implementing it with the actual frontend, we should send the actual index instead of "0"
+      this.state.profile.methods.confirmDebtRequest(0).send,
+
+      // We call this method in order to remove friend's exchange (solidity method)
+      // TODO: when implementing it with the actual frontend, we should send the actual index instead of "0"
+      friendsProfile.methods.confirmDebtRequestNotRestricted(
+        0,
+        newContractAddress
+      ).send,
+    ]);
+    function makeBatchRequest(calls) {
+      let batch = new web3.BatchRequest();
+
+      // let promises = calls.map(call => {
+      calls.map((call) => {
+        return new Promise((res, rej) => {
+          let req = call.request(
+            { from: accounts[0], gas: "2000000" },
+            (err, data) => {
+              if (err) rej(err);
+              else res(data);
+            }
+          );
+          batch.add(req);
+        });
+      });
+      batch.execute();
+    }
+  };
 
   render() {
+    console.log(this);
     return (
       <div>
         <CCard color="info" className="text-white text-center">

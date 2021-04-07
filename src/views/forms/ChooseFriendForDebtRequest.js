@@ -16,9 +16,12 @@ export class ChooseFriendForDebtRequest extends Component {
 
     this.state = {
       friendsList: [],
+      friend: [],
+      allFriends: [],
     };
 
     this.onCheckMyFriends = this.onCheckMyFriends.bind(this);
+    // this.getFriend = this.getFriend.bind(this);
   }
 
   async componentDidMount() {
@@ -36,12 +39,25 @@ export class ChooseFriendForDebtRequest extends Component {
     this.setState({
       friendsList: await this.props.profile.methods.getFriends().call(),
     });
-    // console.log(this.state.friendsList);
+    const length = this.state.friendsList.length;
+    if (length > 0) {
+      for (var index = 0; index < length; index++) {
+        this.setState({
+          allFriends: [
+            ...this.state.allFriends,
+            await this.props.profile.methods.getFriendsByIndex(index).call(),
+          ],
+        });
+      }
+    }
   };
 
   render() {
     const friends = [];
-    for (const [index, value] of Object.entries(this.state.friendsList)) {
+    const amountOfFriends = this.state.friendsList.length;
+    console.log(this.state.allFriends);
+
+    for (const [index, value] of Object.entries(this.state.allFriends)) {
       friends.push(
         <Friend
           key={index}

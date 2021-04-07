@@ -5,7 +5,7 @@ import { TheContent, TheSidebar, TheFooter, TheHeader } from "./index";
 import web3 from "../web3.js";
 import profileAbi from "../profile";
 
-const playerOne = "0x007f874C67735af8e8D8e5d9CfFD85850adBb22D";
+const playerOne = "0x030865da57D5cb3f97653F85E2B11C0ac56F596B";
 
 // I make then 2 different variables as I try to make these 2 different scenarios detailed as possible.
 // In our frontend these 2 variables will be the same one
@@ -32,7 +32,10 @@ const TheLayout = () => {
         address={address}
       />
       <div className="c-wrapper">
-        <TheHeader profile={profile} />
+        <TheHeader
+          profile={profile}
+          compiledBinaryContract={compiledBinaryContract}
+        />
         <div className="c-body">
           <TheContent
             playerOne={playerOne}
