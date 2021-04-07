@@ -144,7 +144,7 @@ export class DebtRequest extends Component {
     let topMessage = "";
     if (this.props.playerOne === this.props.source) {
       topMessage = "pending...";
-      bodyMessage = "you sent " + this.props.destination;
+      bodyMessage = "you sent " + this.props.destinationName;
     } else {
       topMessage = "from: " + this.props.sourceName;
       bodyMessage = this.props.sourceName + " payed you: " + this.props.amount;
