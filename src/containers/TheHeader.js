@@ -62,7 +62,7 @@ const TheHeader = (props) => {
   const handleCloseAddFriend = () => {
     setOpenAddFriend(false);
   };
-  // console.log(props);
+  console.log(props);
   return (
     <CHeader withSubheader>
       <CToggler
@@ -81,18 +81,7 @@ const TheHeader = (props) => {
 
       <CHeaderNav className="d-md-down-none mr-auto">
         <CHeaderNavItem className="px-3">
-          {/* <CHeaderNavLink onClick={handleOpenAddDebt}>Add Debt</CHeaderNavLink> */}
           <CHeaderNavLink to="/AddDebt">Add Debt</CHeaderNavLink>
-          {/* <Dialog
-            open={openAddDebt}
-            onClose={handleCloseAddDebt}
-            aria-labelledby="form-dialog-title"
-          >
-            <DialogTitle id="form-dialog-title">Add Debt</DialogTitle>
-            <DialogContent>
-              <ChooseFriendForDebtRequest />
-            </DialogContent>
-          </Dialog> */}
         </CHeaderNavItem>
 
         <CHeaderNavItem className="px-3">

@@ -93,7 +93,7 @@ export class Contract extends Component {
       );
     }
 
-    console.log(this);
+    // console.log(this);
     return (
       <div>
         {/* <CCard color={this.state.typeOfCard} className="text-white text-center"> */}

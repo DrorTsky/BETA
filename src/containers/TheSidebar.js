@@ -10,6 +10,8 @@ import {
   CSidebarMinimizer,
   CSidebarNavDropdown,
   CSidebarNavItem,
+  CCardBody,
+  CCard,
 } from "@coreui/react";
 
 import CIcon from "@coreui/icons-react";
@@ -41,6 +43,13 @@ const TheSidebar = (props) => {
         />
       </CSidebarBrand>
       <CSidebarNav>
+        <CSidebarNavItem>
+          <CCard>
+            <CCardBody>
+              <h8 style={{ color: "black" }}>{props.address}</h8>
+            </CCardBody>
+          </CCard>
+        </CSidebarNavItem>
         <CCreateElement
           items={navigation}
           components={{
