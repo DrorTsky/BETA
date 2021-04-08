@@ -17,7 +17,7 @@ export class TheHeaderDropdownNotif extends Component {
     this.state = {
       exchanges: [],
       allExchanges: [],
-      totalRequests: 0,
+      // totalRequests: 0,
       friendRequests: 0,
       debtRequests: 0,
       rotationRequests: 0,
@@ -27,49 +27,60 @@ export class TheHeaderDropdownNotif extends Component {
     this.setFriendRequests = this.setFriendRequests.bind(this);
     this.setDebtRequests = this.setDebtRequests.bind(this);
     this.setRotationRequests = this.setRotationRequests.bind(this);
-    this.setStateAndAmountOfExchanges = this.setStateAndAmountOfExchanges.bind(
-      this
-    );
+    // this.setStateAndAmountOfExchanges = this.setStateAndAmountOfExchanges.bind(
+    //   this
+    // );
   }
 
-  async componentDidMount() {
-    if (
-      (await this.props.profile.methods.getAllExchanges().call())[0] !==
-      undefined
-    ) {
-      var exchange = {};
-      Promise.resolve(
-        (exchange = (
-          await this.props.profile.methods.getAllExchanges().call()
-        )[0].transaction)
-      ).then(this.setStateAndAmountOfExchanges());
-    }
+  // async componentDidMount() {
+  //   if (
+  //     (await this.props.profile.methods.getAllExchanges().call())[0] !==
+  //     undefined
+  //   ) {
+  //     var exchange = {};
+  //     Promise.resolve(
+  //       (exchange = (
+  //         await this.props.profile.methods.getAllExchanges().call()
+  //       )[0].transaction)
+  //     ).then(this.setStateAndAmountOfExchanges());
+  //   }
+  // }
+
+  // setStateAndAmountOfExchanges = async () => {
+  //   this.setState({
+  //     exchanges: await this.props.profile.methods.getAllExchanges().call(),
+  //   });
+  //   this.setState({
+  //     totalRequests: this.state.exchanges.length,
+  //   });
+  //   if (this.state.totalRequests > 0) {
+  //     for (var index = 0; index < this.state.totalRequests; index++) {
+  //       this.setState({
+  //         allExchanges: [
+  //           ...this.state.allExchanges,
+  //           await this.props.profile.methods
+  //             .getAllExchangesByIndex(index)
+  //             .call(),
+  //         ],
+  //       });
+  //     }
+  //   }
+  // };
+  componentDidMount() {
+    this.setTotalRequests();
   }
 
-  setStateAndAmountOfExchanges = async () => {
-    this.setState({
-      exchanges: await this.props.profile.methods.getAllExchanges().call(),
-    });
-    this.setState({
-      totalRequests: this.state.exchanges.length,
-    });
-    if (this.state.totalRequests > 0) {
-      for (var index = 0; index < this.state.totalRequests; index++) {
-        this.setState({
-          allExchanges: [
-            ...this.state.allExchanges,
-            await this.props.profile.methods
-              .getAllExchangesByIndex(index)
-              .call(),
-          ],
-        });
-      }
+  componentDidUpdate(prevProps) {
+    if (this.props.user != prevProps.user) {
+      // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
+      this.setTotalRequests();
     }
-  };
+  }
 
   setTotalRequests = () => {
     this.setState({
-      totalRequests: this.state.exchanges.length,
+      // totalRequests: this.state.exchanges.length,
+      totalRequests: this.props.totalRequests,
     });
   };
   setFriendRequests = (num) => {
@@ -90,16 +101,17 @@ export class TheHeaderDropdownNotif extends Component {
 
   render() {
     let plural =
-      this.state.totalRequests === 1 ? "notification" : "notifications";
+      this.props.totalRequests === 1 ? "notification" : "notifications";
 
-    // console.log(this);
+    console.log(this);
 
     let totalBadge, friendBadge, debtBadge, rotationBadge;
     let sumFriendRequests = 0;
     let sumDebtRequests = 0;
     let sumRotationRequests = 0;
 
-    for (const exchange of Object.entries(this.state.allExchanges)) {
+    // for (const exchange of Object.entries(this.state.allExchanges)) {
+    for (const exchange of Object.entries(this.props.allExchanges)) {
       try {
         // console.log(exchange[1]);
         if (exchange[1].exchangePurpose === "0") sumFriendRequests += 1;
@@ -111,9 +123,9 @@ export class TheHeaderDropdownNotif extends Component {
     }
 
     totalBadge =
-      this.state.totalRequests === 0 ? null : (
+      this.props.totalRequests === 0 ? null : (
         <CBadge shape="pill" color="danger">
-          {this.state.totalRequests}
+          {this.props.totalRequests}
         </CBadge>
       );
     friendBadge =
@@ -144,7 +156,7 @@ export class TheHeaderDropdownNotif extends Component {
         <CDropdownMenu placement="bottom-end" className="pt-0">
           <CDropdownItem header tag="div" className="text-center" color="light">
             <strong>
-              You have {this.state.totalRequests} {plural}
+              You have {this.props.totalRequests} {plural}
             </strong>
           </CDropdownItem>
           <CDropdownItem>
@@ -214,51 +226,3 @@ export class TheHeaderDropdownNotif extends Component {
 }
 
 export default TheHeaderDropdownNotif;
-
-// const TheHeaderDropdownNotif = () => {
-//   const itemsCount = 5;
-//   return (
-//     <CDropdown inNav className="c-header-nav-item mx-2">
-//       <CDropdownToggle className="c-header-nav-link" caret={false}>
-//         <CIcon name="cil-bell" />
-//         <CBadge shape="pill" color="danger">
-//           {itemsCount}
-//         </CBadge>
-//       </CDropdownToggle>
-//       <CDropdownMenu placement="bottom-end" className="pt-0">
-//         <CDropdownItem header tag="div" className="text-center" color="light">
-//           <strong>You have {itemsCount} notifications</strong>
-//         </CDropdownItem>
-//         <CDropdownItem>
-//           <p>
-//             display exchanges
-//             <br />
-//             create button per notification
-//             <br />
-//             define max size
-//           </p>
-//         </CDropdownItem>
-//         <CDropdownItem>
-//           <CLink to="/friend_requests" className="text-success">
-//             <CIcon name="cil-user-follow" className="mr-2 text-success" />
-//             Friend Request
-//           </CLink>
-//         </CDropdownItem>
-//         <CDropdownItem>
-//           <CLink to="/debt_requests" className="text-info">
-//             <CIcon name="cil-chart-pie" className="mr-2 text-info" /> Exchange
-//             request
-//           </CLink>
-//         </CDropdownItem>
-//         <CDropdownItem>
-//           <CLink to="/rotation_requests" className="text-primary">
-//             <CIcon name="cil-arrow-right" className="mr-2 text-primary" />
-//             Rotation request
-//           </CLink>
-//         </CDropdownItem>
-//       </CDropdownMenu>
-//     </CDropdown>
-//   );
-// };
-
-// export default TheHeaderDropdownNotif;
