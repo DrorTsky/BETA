@@ -191,10 +191,6 @@ export class DebtRequest extends Component {
         batch.execute();
       }
     }
-    // TODO waiting for omer to make a function that removes an exchange by creationTime
-    // makeBatchRequest([
-
-    // ])
   };
 
   render() {

@@ -9,7 +9,7 @@ export class FriendRequests extends Component {
   }
 
   render() {
-    // console.log(this);
+    console.log(this);
     return (
       <div>
         <Exchanges type="0" profile={this.props.profile} {...this.props} />

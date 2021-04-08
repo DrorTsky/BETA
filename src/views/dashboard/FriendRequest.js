@@ -9,6 +9,7 @@ export class FriendRequest extends Component {
 
     this.state = {};
     this.confirmFriendRequest = this.confirmFriendRequest.bind(this);
+    this.declineFriendRequest = this.declineFriendRequest.bind(this);
   }
 
   async confirmFriendRequest(event) {
@@ -80,6 +81,66 @@ export class FriendRequest extends Component {
     }
   }
 
+  declineFriendRequest = async (event) => {
+    event.preventDefault();
+    //getting users account
+    const accounts = await web3.eth.getAccounts();
+
+    //testing which address is not the user
+    const friendsAddress =
+      this.props.exchange.exchangeDetails.source === this.props.playerOne
+        ? this.props.exchange.exchangeDetails.destination
+        : this.props.exchange.exchangeDetails.source;
+    //getting other participants profile
+    const friendsProfile = new web3.eth.Contract(profileAbi, friendsAddress);
+    //find the right friend exchange index
+    let friendsExchangeIndex = -1;
+    const friendsExchanges = await friendsProfile.methods
+      .getAllExchanges()
+      .call();
+    const length = friendsExchanges.length;
+    if (length > 0) {
+      for (var friendsIndex = 0; friendsIndex < length; friendsIndex++) {
+        let exchange = await friendsProfile.methods
+          .getAllExchangesByIndex(friendsIndex)
+          .call();
+        if (
+          exchange.exchangePurpose === this.props.exchange.exchangePurpose &&
+          exchange.transaction.date === this.props.exchange.transaction.date
+        ) {
+          friendsExchangeIndex = friendsIndex;
+          console.log(exchange);
+        }
+      }
+
+      // BATCH
+      // if (friendsExchangeIndex !== -1) {
+      makeBatchRequest([
+        // remove both of the exchanges in a batch request.
+        friendsProfile.methods.removeExchange(friendsExchangeIndex).send,
+        this.props.profile.methods.removeExchange(this.props.index).send,
+      ]);
+      // }
+      function makeBatchRequest(calls) {
+        let batch = new web3.BatchRequest();
+
+        calls.map((call) => {
+          return new Promise((res, rej) => {
+            let req = call.request(
+              { from: accounts[0], gas: "2000000" },
+              (err, data) => {
+                if (err) rej(err);
+                else res(data);
+              }
+            );
+            batch.add(req);
+          });
+        });
+        batch.execute();
+      }
+    }
+  };
+
   render() {
     console.log(this);
     let bodyMessage = "";
@@ -114,7 +175,7 @@ export class FriendRequest extends Component {
                 size="sm"
                 color="dark"
                 className="buttons_inside_contract_list"
-                //   onClick={this.handleOpenAddDebt}
+                onClick={this.declineFriendRequest}
               >
                 refuse
               </CButton>

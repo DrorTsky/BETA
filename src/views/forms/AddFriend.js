@@ -40,6 +40,7 @@ export class AddFriend extends Component {
     this.addFriendFormSubmit = this.addFriendFormSubmit.bind(this);
     this.onChangeFormInput = this.onChangeFormInput.bind(this);
     this.onCheckMyFriends = this.onCheckMyFriends.bind(this);
+    this.addFriend = this.addFriend.bind(this);
   }
   // static profile = new web3.eth.Contract(profileAbi, this.props.playerOne);
   async componentDidMount() {
@@ -70,50 +71,62 @@ export class AddFriend extends Component {
 
   addFriendFormSubmit = async (event) => {
     event.preventDefault();
-
-    for (const [index, value] of Object.entries(this.state.allFriends)) {
-      if (value.friendAddress !== this.state.friendsAddress) {
-        const accounts = await web3.eth.getAccounts();
-        // Getting accounts list
-        // Getting a reference to a friendsProfile - NOTE: it will work only if the user provided us friendsProfile address
-        const friendsProfile = new web3.eth.Contract(
-          profileAbi,
-          this.state.friendsAddress
-        );
-
-        // NOTE: that's how I convert between a batch request and 2 seperate "send" requests:
-
-        makeBatchRequest([
-          // add both of the exchanges in a batch request.
-          this.state.profile.methods.addFriendRequest(
-            this.state.friendsAddress,
-            name
-          ).send,
-          friendsProfile.methods.addFriendRequestNotRestricted(
-            this.state.address,
-            name
-          ).send,
-        ]);
-        function makeBatchRequest(calls) {
-          let batch = new web3.BatchRequest();
-          calls.map((call) => {
-            return new Promise((res, rej) => {
-              let req = call.request(
-                { from: accounts[0], gas: "1000000" },
-                (err, data) => {
-                  if (err) rej(err);
-                  else res(data);
-                }
-              );
-              batch.add(req);
-            });
-          });
-          batch.execute();
+    console.log("in addFriendFormSubmit");
+    if (this.state.allFriends.length !== 0) {
+      for (const [index, value] of Object.entries(this.state.allFriends)) {
+        console.log(value);
+        if (
+          value.friendAddress !== this.state.friendsAddress ||
+          this.state.allFriends.length === 0
+        ) {
+          this.addFriend();
+        } else {
+          console.log("friend exists");
+          break;
         }
-      } else {
-        console.log("friend exists");
-        break;
       }
+    } else {
+      this.addFriend();
+    }
+  };
+
+  addFriend = async () => {
+    const accounts = await web3.eth.getAccounts();
+    // Getting accounts list
+    // Getting a reference to a friendsProfile - NOTE: it will work only if the user provided us friendsProfile address
+    const friendsProfile = new web3.eth.Contract(
+      profileAbi,
+      this.state.friendsAddress
+    );
+
+    // NOTE: that's how I convert between a batch request and 2 seperate "send" requests:
+
+    makeBatchRequest([
+      // add both of the exchanges in a batch request.
+      this.state.profile.methods.addFriendRequest(
+        this.state.friendsAddress,
+        name
+      ).send,
+      friendsProfile.methods.addFriendRequestNotRestricted(
+        this.state.address,
+        name
+      ).send,
+    ]);
+    function makeBatchRequest(calls) {
+      let batch = new web3.BatchRequest();
+      calls.map((call) => {
+        return new Promise((res, rej) => {
+          let req = call.request(
+            { from: accounts[0], gas: "1000000" },
+            (err, data) => {
+              if (err) rej(err);
+              else res(data);
+            }
+          );
+          batch.add(req);
+        });
+      });
+      batch.execute();
     }
   };
 
