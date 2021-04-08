@@ -58,7 +58,6 @@ const TheSidebar = (props) => {
             CSidebarNavItem,
             CSidebarNavTitle,
           }}
-          address={props.address}
         />
       </CSidebarNav>
       <CSidebarMinimizer className="c-d-md-down-none" />

@@ -33,51 +33,87 @@ export class AddFriend extends Component {
       address: this.props.playerOne,
       friendsAddress: this.props.playerTwo,
       profile: this.props.profile,
+      friendsList: [],
+      friend: [],
+      allFriends: [],
     };
     this.addFriendFormSubmit = this.addFriendFormSubmit.bind(this);
     this.onChangeFormInput = this.onChangeFormInput.bind(this);
+    this.onCheckMyFriends = this.onCheckMyFriends.bind(this);
   }
   // static profile = new web3.eth.Contract(profileAbi, this.props.playerOne);
+  async componentDidMount() {
+    // console.log(this.state.friendsList);
+    let ethereum = window.ethereum;
+    if (typeof ethereum !== "undefined") {
+      await ethereum.enable();
+    }
+    this.onCheckMyFriends();
+  }
+
+  onCheckMyFriends = async () => {
+    this.setState({
+      friendsList: await this.props.profile.methods.getFriends().call(),
+    });
+    const length = this.state.friendsList.length;
+    if (length > 0) {
+      for (var index = 0; index < length; index++) {
+        this.setState({
+          allFriends: [
+            ...this.state.allFriends,
+            await this.props.profile.methods.getFriendsByIndex(index).call(),
+          ],
+        });
+      }
+    }
+  };
 
   addFriendFormSubmit = async (event) => {
     event.preventDefault();
 
-    // Getting accounts list
-    const accounts = await web3.eth.getAccounts();
-    // Getting a reference to a friendsProfile - NOTE: it will work only if the user provided us friendsProfile address
-    const friendsProfile = new web3.eth.Contract(
-      profileAbi,
-      this.state.friendsAddress
-    );
+    for (const [index, value] of Object.entries(this.state.allFriends)) {
+      if (value.friendAddress !== this.state.friendsAddress) {
+        const accounts = await web3.eth.getAccounts();
+        // Getting accounts list
+        // Getting a reference to a friendsProfile - NOTE: it will work only if the user provided us friendsProfile address
+        const friendsProfile = new web3.eth.Contract(
+          profileAbi,
+          this.state.friendsAddress
+        );
 
-    // NOTE: that's how I convert between a batch request and 2 seperate "send" requests:
+        // NOTE: that's how I convert between a batch request and 2 seperate "send" requests:
 
-    makeBatchRequest([
-      // add both of the exchanges in a batch request.
-      this.state.profile.methods.addFriendRequest(
-        this.state.friendsAddress,
-        name
-      ).send,
-      friendsProfile.methods.addFriendRequestNotRestricted(
-        this.state.address,
-        name
-      ).send,
-    ]);
-    function makeBatchRequest(calls) {
-      let batch = new web3.BatchRequest();
-      calls.map((call) => {
-        return new Promise((res, rej) => {
-          let req = call.request(
-            { from: accounts[0], gas: "1000000" },
-            (err, data) => {
-              if (err) rej(err);
-              else res(data);
-            }
-          );
-          batch.add(req);
-        });
-      });
-      batch.execute();
+        makeBatchRequest([
+          // add both of the exchanges in a batch request.
+          this.state.profile.methods.addFriendRequest(
+            this.state.friendsAddress,
+            name
+          ).send,
+          friendsProfile.methods.addFriendRequestNotRestricted(
+            this.state.address,
+            name
+          ).send,
+        ]);
+        function makeBatchRequest(calls) {
+          let batch = new web3.BatchRequest();
+          calls.map((call) => {
+            return new Promise((res, rej) => {
+              let req = call.request(
+                { from: accounts[0], gas: "1000000" },
+                (err, data) => {
+                  if (err) rej(err);
+                  else res(data);
+                }
+              );
+              batch.add(req);
+            });
+          });
+          batch.execute();
+        }
+      } else {
+        console.log("friend exists");
+        break;
+      }
     }
   };
 
@@ -94,6 +130,7 @@ export class AddFriend extends Component {
   }
 
   render() {
+    console.log(this);
     return (
       <div>
         <CCard>

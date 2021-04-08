@@ -62,7 +62,7 @@ const TheHeader = (props) => {
   const handleCloseAddFriend = () => {
     setOpenAddFriend(false);
   };
-  console.log(props);
+  // console.log(props);
   return (
     <CHeader withSubheader>
       <CToggler

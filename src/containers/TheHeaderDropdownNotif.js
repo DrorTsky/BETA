@@ -103,14 +103,13 @@ export class TheHeaderDropdownNotif extends Component {
     let plural =
       this.props.totalRequests === 1 ? "notification" : "notifications";
 
-    console.log(this);
+    // console.log(this);
 
     let totalBadge, friendBadge, debtBadge, rotationBadge;
     let sumFriendRequests = 0;
     let sumDebtRequests = 0;
     let sumRotationRequests = 0;
 
-    // for (const exchange of Object.entries(this.state.allExchanges)) {
     for (const exchange of Object.entries(this.props.allExchanges)) {
       try {
         // console.log(exchange[1]);
