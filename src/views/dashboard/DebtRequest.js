@@ -197,13 +197,46 @@ export class DebtRequest extends Component {
     // console.log(this);
     let bodyMessage = "";
     let topMessage = "";
+    const buttons = [];
     if (this.props.playerOne === this.props.source) {
       topMessage = "pending...";
       bodyMessage =
         "you sent " + this.props.destinationName + " " + this.props.amount;
+      buttons.push(
+        <div>
+          <CButton
+            size="sm"
+            color="dark"
+            className="buttons_inside_contract_list"
+            onClick={this.declineDebtRequest}
+          >
+            cancel request
+          </CButton>
+        </div>
+      );
     } else {
       topMessage = "from: " + this.props.sourceName;
       bodyMessage = this.props.sourceName + " payed you: " + this.props.amount;
+      buttons.push(
+        <div>
+          <CButton
+            size="sm"
+            color="secondary"
+            className="buttons_inside_contract_list"
+            onClick={this.confirmDebtRequest}
+          >
+            accept
+          </CButton>
+          <CButton
+            size="sm"
+            color="dark"
+            className="buttons_inside_contract_list"
+            onClick={this.declineDebtRequest}
+          >
+            refuse
+          </CButton>
+        </div>
+      );
     }
     return (
       <div>
@@ -218,7 +251,7 @@ export class DebtRequest extends Component {
             </blockquote>
 
             <footer className="footer_contract_list_element">
-              <CButton
+              {/* <CButton
                 size="sm"
                 color="secondary"
                 className="buttons_inside_contract_list"
@@ -233,7 +266,8 @@ export class DebtRequest extends Component {
                 onClick={this.declineDebtRequest}
               >
                 refuse
-              </CButton>
+              </CButton> */}
+              {buttons}
             </footer>
           </CCardBody>
         </CCard>

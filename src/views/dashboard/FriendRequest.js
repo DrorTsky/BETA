@@ -145,12 +145,45 @@ export class FriendRequest extends Component {
     console.log(this);
     let bodyMessage = "";
     let topMessage = "";
+    const buttons = [];
     if (this.props.playerOne === this.props.source) {
       topMessage = "pending...";
       bodyMessage = "waiting for " + this.props.destinationName + " to accept";
+      buttons.push(
+        <div>
+          <CButton
+            size="sm"
+            color="dark"
+            className="buttons_inside_contract_list"
+            onClick={this.declineFriendRequest}
+          >
+            cancel request
+          </CButton>
+        </div>
+      );
     } else {
       topMessage = "from: " + this.props.sourceName;
       bodyMessage = this.props.sourceName + " sent you a friend request";
+      buttons.push(
+        <div>
+          <CButton
+            size="sm"
+            color="secondary"
+            className="buttons_inside_contract_list"
+            onClick={this.confirmFriendRequest}
+          >
+            accept
+          </CButton>
+          <CButton
+            size="sm"
+            color="dark"
+            className="buttons_inside_contract_list"
+            onClick={this.declineFriendRequest}
+          >
+            refuse
+          </CButton>
+        </div>
+      );
     }
     return (
       <div>
@@ -163,7 +196,7 @@ export class FriendRequest extends Component {
             </blockquote>
 
             <footer className="footer_contract_list_element">
-              <CButton
+              {/* <CButton
                 size="sm"
                 color="secondary"
                 className="buttons_inside_contract_list"
@@ -178,7 +211,8 @@ export class FriendRequest extends Component {
                 onClick={this.declineFriendRequest}
               >
                 refuse
-              </CButton>
+              </CButton> */}
+              {buttons}
             </footer>
           </CCardBody>
         </CCard>
