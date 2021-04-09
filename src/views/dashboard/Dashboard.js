@@ -24,7 +24,7 @@ import {
   CInputGroupAppend,
 } from "@coreui/react";
 import CIcon from "@coreui/icons-react";
-import Exchanges from "./Exchanges";
+import Exchanges from "../requests/Exchanges";
 
 // const playerOne = "0x007f874C67735af8e8D8e5d9CfFD85850adBb22D";
 

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Exchanges from "../dashboard/Exchanges";
+import Exchanges from "./Exchanges";
 
 export class RotationRequests extends Component {
   constructor(props) {

@@ -47,7 +47,7 @@ import React from "react";
 // const Charts = React.lazy(() => import("./views/charts/Charts"));
 const Dashboard = React.lazy(() => import("./views/dashboard/Dashboard"));
 const AddFriend = React.lazy(() => import("./views/forms/AddFriend"));
-const Exchanges = React.lazy(() => import("./views/dashboard/Exchanges"));
+const Exchanges = React.lazy(() => import("./views/requests/Exchanges"));
 const FriendRequests = React.lazy(() =>
   import("./views/requests/FriendRequests")
 );

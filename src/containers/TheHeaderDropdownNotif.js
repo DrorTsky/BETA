@@ -71,7 +71,7 @@ export class TheHeaderDropdownNotif extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.user != prevProps.user) {
+    if (this.props.totalRequests != prevProps.totalRequests) {
       // Check if it's a new user, you can also use some unique property, like the ID  (this.props.user.id !== prevProps.user.id)
       this.setTotalRequests();
     }
