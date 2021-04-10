@@ -17,7 +17,6 @@ export class TheHeaderDropdownNotif extends Component {
     this.state = {
       exchanges: [],
       allExchanges: [],
-      // totalRequests: 0,
       friendRequests: 0,
       debtRequests: 0,
       rotationRequests: 0,
@@ -27,45 +26,8 @@ export class TheHeaderDropdownNotif extends Component {
     this.setFriendRequests = this.setFriendRequests.bind(this);
     this.setDebtRequests = this.setDebtRequests.bind(this);
     this.setRotationRequests = this.setRotationRequests.bind(this);
-    // this.setStateAndAmountOfExchanges = this.setStateAndAmountOfExchanges.bind(
-    //   this
-    // );
   }
 
-  // async componentDidMount() {
-  //   if (
-  //     (await this.props.profile.methods.getAllExchanges().call())[0] !==
-  //     undefined
-  //   ) {
-  //     var exchange = {};
-  //     Promise.resolve(
-  //       (exchange = (
-  //         await this.props.profile.methods.getAllExchanges().call()
-  //       )[0].transaction)
-  //     ).then(this.setStateAndAmountOfExchanges());
-  //   }
-  // }
-
-  // setStateAndAmountOfExchanges = async () => {
-  //   this.setState({
-  //     exchanges: await this.props.profile.methods.getAllExchanges().call(),
-  //   });
-  //   this.setState({
-  //     totalRequests: this.state.exchanges.length,
-  //   });
-  //   if (this.state.totalRequests > 0) {
-  //     for (var index = 0; index < this.state.totalRequests; index++) {
-  //       this.setState({
-  //         allExchanges: [
-  //           ...this.state.allExchanges,
-  //           await this.props.profile.methods
-  //             .getAllExchangesByIndex(index)
-  //             .call(),
-  //         ],
-  //       });
-  //     }
-  //   }
-  // };
   componentDidMount() {
     this.setTotalRequests();
   }
@@ -158,66 +120,72 @@ export class TheHeaderDropdownNotif extends Component {
               You have {this.props.totalRequests} {plural}
             </strong>
           </CDropdownItem>
-          <CDropdownItem>
-            <p>
-              display exchanges
-              <br />
-              create button per notification
-              <br />
-              define max size
-            </p>
-          </CDropdownItem>
-          <CDropdownItem>
-            <CLink
-              to={{
-                pathname: "/friend_requests",
-                requestProps: {
-                  compiledBinaryContract: this.props.compiledBinaryContract,
-                },
-              }}
-              className="text-success"
-            >
-              <CIcon name="cil-user-follow" className="mr-2 text-success" />
-              Friend Request
-            </CLink>
-            <CBadge color="danger" className="mfs-auto">
-              {friendBadge}
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem>
-            <CLink
-              to={{
-                pathname: "/debt_requests",
-                requestProps: {
-                  compiledBinaryContract: this.props.compiledBinaryContract,
-                },
-              }}
-              className="text-info"
-            >
-              <CIcon name="cil-chart-pie" className="mfe-2 mr-2 text-info" />{" "}
-              Exchange request
-            </CLink>
-            <CBadge color="danger" className="mfs-auto">
-              {debtBadge}
-            </CBadge>
-          </CDropdownItem>
-          <CDropdownItem>
-            <CLink
-              to={{
-                pathname: "/rotation_requests",
-                requestProps: {
-                  compiledBinaryContract: this.props.compiledBinaryContract,
-                },
-              }}
-              className="text-primary"
-            >
-              <CIcon name="cil-arrow-right" className="mr-2 text-primary" />
-              Rotation request
-            </CLink>
-            <CBadge color="danger" className="mfs-auto">
-              {rotationBadge}
-            </CBadge>
-          </CDropdownItem>
+
+          {sumFriendRequests !== 0 ? (
+            <CDropdownItem>
+              <CLink
+                to={{
+                  pathname: "/friend_requests",
+                  requestProps: {
+                    compiledBinaryContract: this.props.compiledBinaryContract,
+                  },
+                }}
+                className="text-success"
+              >
+                <CIcon name="cil-user-follow" className="mr-2 text-success" />
+                Friend Request
+              </CLink>
+              <CBadge color="danger" className="mfs-auto">
+                {friendBadge}
+              </CBadge>
+            </CDropdownItem>
+          ) : (
+            ""
+          )}
+
+          {sumDebtRequests !== 0 ? (
+            <CDropdownItem>
+              <CLink
+                to={{
+                  pathname: "/debt_requests",
+                  requestProps: {
+                    compiledBinaryContract: this.props.compiledBinaryContract,
+                  },
+                }}
+                className="text-info"
+              >
+                <CIcon name="cil-chart-pie" className="mfe-2 mr-2 text-info" />{" "}
+                Exchange request
+              </CLink>
+              <CBadge color="danger" className="mfs-auto">
+                {debtBadge}
+              </CBadge>
+            </CDropdownItem>
+          ) : (
+            ""
+          )}
+
+          {sumRotationRequests !== 0 ? (
+            <CDropdownItem>
+              <CLink
+                to={{
+                  pathname: "/rotation_requests",
+                  requestProps: {
+                    compiledBinaryContract: this.props.compiledBinaryContract,
+                  },
+                }}
+                className="text-primary"
+              >
+                <CIcon name="cil-arrow-right" className="mr-2 text-primary" />
+                Rotation request
+              </CLink>
+              <CBadge color="danger" className="mfs-auto">
+                {rotationBadge}
+              </CBadge>
+            </CDropdownItem>
+          ) : (
+            ""
+          )}
         </CDropdownMenu>
       </CDropdown>
     );
