@@ -83,13 +83,13 @@ export class DebtRequest extends Component {
         .call();
     }
 
-    let currentBinaryContractAddress = contractExisted
-      ? existedContractAddress
-      : deployedContractAddress;
-    let currentBinaryContract = await new web3.eth.Contract(
-      JSON.parse(this.props.compiledBinaryContract.interface),
-      currentBinaryContractAddress
-    );
+    // let currentBinaryContractAddress = contractExisted
+    //   ? existedContractAddress
+    //   : deployedContractAddress;
+    // let currentBinaryContract = await new web3.eth.Contract(
+    //   JSON.parse(this.props.compiledBinaryContract.interface),
+    //   currentBinaryContractAddress
+    // );
 
     let friendsProfile = new web3.eth.Contract(profileAbi, this.props.source);
 

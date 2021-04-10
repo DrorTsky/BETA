@@ -24,7 +24,7 @@ export class AmountToRotateRotationDialog extends Component {
 
   submitRotation = (event) => {
     event.preventDefault();
-    console.log(this);
+    // console.log(this);
     this.props.handleClose();
   };
 
@@ -45,9 +45,8 @@ export class AmountToRotateRotationDialog extends Component {
     const {
       target: { name, value },
     } = event;
-    console.log(name);
     if (!Number(value)) {
-      console.log(value);
+      return;
     } else {
       parseInt(value) > this.state.maxAmountToRotate
         ? this.setState({ [name]: this.state.maxAmountToRotate })
@@ -58,11 +57,6 @@ export class AmountToRotateRotationDialog extends Component {
 
   render() {
     // console.log(this);
-    const maxAmountToRotate =
-      parseInt(this.props.selectedCreditor.debt) >
-      parseInt(this.props.selectedDebtor.debt)
-        ? this.props.selectedDebtor.debt
-        : this.props.selectedCreditor.debt;
     return (
       <div>
         <CCard>
@@ -99,11 +93,6 @@ export class AmountToRotateRotationDialog extends Component {
                 ) : (
                   ""
                 )}
-                {/* <CRow>
-                  <CFormText>
-                    transferring: {this.state.amountToRotate}
-                  </CFormText>
-                </CRow> */}
               </CFormGroup>
               <CFormGroup style={{ textAlign: "center" }}>
                 <CButton

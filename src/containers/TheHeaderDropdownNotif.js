@@ -114,7 +114,11 @@ export class TheHeaderDropdownNotif extends Component {
           <CIcon name="cil-bell" />
           {totalBadge}
         </CDropdownToggle>
-        <CDropdownMenu placement="bottom-end" className="pt-0">
+        <CDropdownMenu
+          placement="bottom-end"
+          className="pt-0"
+          style={{ minWidth: "12rem" }}
+        >
           <CDropdownItem header tag="div" className="text-center" color="light">
             <strong>
               You have {this.props.totalRequests} {plural}
@@ -135,7 +139,11 @@ export class TheHeaderDropdownNotif extends Component {
                 <CIcon name="cil-user-follow" className="mr-2 text-success" />
                 Friend Request
               </CLink>
-              <CBadge color="danger" className="mfs-auto">
+              <CBadge
+                color="danger"
+                className="mfs-auto"
+                style={{ fontSize: "12px" }}
+              >
                 {friendBadge}
               </CBadge>
             </CDropdownItem>
