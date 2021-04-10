@@ -11,12 +11,13 @@ import {
   CFormText,
   CRow,
 } from "@coreui/react";
+import { FALSE } from "node-sass";
 
 export class AmountToRotateRotationDialog extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { amountToRotate: "" };
+    this.state = { amountToRotate: 0, maxAmountToRotate: 0 };
     this.onChangeFormInput = this.onChangeFormInput.bind(this);
     this.submitRotation = this.submitRotation.bind(this);
   }
@@ -27,6 +28,15 @@ export class AmountToRotateRotationDialog extends Component {
     this.props.handleClose();
   };
 
+  componentDidMount() {
+    const maxAmountToRotate =
+      parseInt(this.props.selectedCreditor.debt) >
+      parseInt(this.props.selectedDebtor.debt)
+        ? parseInt(this.props.selectedDebtor.debt)
+        : parseInt(this.props.selectedCreditor.debt);
+
+    this.setState({ maxAmountToRotate: maxAmountToRotate });
+  }
   // *****************************************************
   //                  FORM CHANGE HANDLERS
   // *****************************************************
@@ -35,11 +45,19 @@ export class AmountToRotateRotationDialog extends Component {
     const {
       target: { name, value },
     } = event;
-    this.setState({ [name]: value });
+    console.log(name);
+    if (!Number(value)) {
+      console.log(value);
+    } else {
+      parseInt(value) > this.state.maxAmountToRotate
+        ? this.setState({ [name]: this.state.maxAmountToRotate })
+        : this.setState({ [name]: value });
+    }
+    // this.setState({ [name]: value });
   }
 
   render() {
-    console.log(this);
+    // console.log(this);
     const maxAmountToRotate =
       parseInt(this.props.selectedCreditor.debt) >
       parseInt(this.props.selectedDebtor.debt)
@@ -59,13 +77,33 @@ export class AmountToRotateRotationDialog extends Component {
                     id="amountDebt"
                     name="amountToRotate"
                     placeholder="Amount"
+                    autoComplete="off"
                     onChange={this.onChangeFormInput}
-                    style={{ textAlign: "center", maxWidth: "70%" }}
+                    required
+                    style={{
+                      textAlign: "center",
+                      maxWidth: "70%",
+                      paddingRight: "10%",
+                    }}
                   />
                   <CFormText style={{ paddingLeft: "5%", fontSize: "130%" }}>
-                    / {maxAmountToRotate}
+                    / {this.state.maxAmountToRotate}
                   </CFormText>
                 </CRow>
+                {this.state.amountToRotate !== 0 ? (
+                  <CRow>
+                    <CFormText>
+                      transferring: {this.state.amountToRotate}
+                    </CFormText>
+                  </CRow>
+                ) : (
+                  ""
+                )}
+                {/* <CRow>
+                  <CFormText>
+                    transferring: {this.state.amountToRotate}
+                  </CFormText>
+                </CRow> */}
               </CFormGroup>
               <CFormGroup style={{ textAlign: "center" }}>
                 <CButton
@@ -73,6 +111,7 @@ export class AmountToRotateRotationDialog extends Component {
                   size="sm"
                   color="secondary"
                   className="confirm_button"
+                  disabled={this.state.amountToRotate > 0 ? false : true}
                 >
                   Confirm
                 </CButton>
