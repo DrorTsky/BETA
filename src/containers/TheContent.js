@@ -29,7 +29,7 @@ const TheContent = (props) => {
   const address = props.address;
 
   return (
-    <main className="c-main">
+    <main className="c-main" style={{ paddingTop: "1rem" }}>
       <CContainer fluid>
         <Suspense fallback={loading}>
           <Switch>

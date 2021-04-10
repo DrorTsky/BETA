@@ -142,7 +142,7 @@ export class FriendRequest extends Component {
   };
 
   render() {
-    console.log(this);
+    // console.log(this);
     let bodyMessage = "";
     let topMessage = "";
     const buttons = [];
