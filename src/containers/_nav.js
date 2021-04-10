@@ -27,7 +27,7 @@ const _nav = [
   {
     _tag: "CSidebarNavItem",
     name: "Check Rotation",
-    to: "/dashboard",
+    to: "/Rotation",
     icon: <CIcon name="cil-arrow-right" customClasses="c-sidebar-nav-icon" />,
   },
 ];

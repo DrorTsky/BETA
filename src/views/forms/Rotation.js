@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ChooseFriendsForRotationRequest from "./ChooseFriendsForRotationRequest";
 
 export class Rotation extends Component {
   constructor(props) {
@@ -8,7 +9,13 @@ export class Rotation extends Component {
   }
 
   render() {
-    return <div></div>;
+    return (
+      <div>
+        <ChooseFriendsForRotationRequest
+          {...this.props}
+        ></ChooseFriendsForRotationRequest>
+      </div>
+    );
   }
 }
 

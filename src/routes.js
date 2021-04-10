@@ -47,6 +47,7 @@ import React from "react";
 // const Charts = React.lazy(() => import("./views/charts/Charts"));
 const Dashboard = React.lazy(() => import("./views/dashboard/Dashboard"));
 const AddFriend = React.lazy(() => import("./views/forms/AddFriend"));
+const Rotation = React.lazy(() => import("./views/forms/Rotation"));
 const Exchanges = React.lazy(() => import("./views/requests/Exchanges"));
 const FriendRequests = React.lazy(() =>
   import("./views/requests/FriendRequests")
@@ -79,6 +80,7 @@ const routes = [
   { path: "/dashboard", name: "Dashboard", component: Dashboard },
   { path: "/addDebt", name: "Add Debt", component: AddDebt },
   { path: "/addFriend", name: "Add Friend", component: AddFriend },
+  { path: "/Rotation", name: "choose friends", component: Rotation },
   { path: "/Exchanges", name: "Exchanges", component: Exchanges },
   {
     path: "/friend_requests",
