@@ -1,3 +1,6 @@
+import React, { Component } from "react";
+import web3 from "../../web3.js";
+//CORE-UI
 import {
   CCol,
   CRow,
@@ -6,9 +9,16 @@ import {
   CCardHeader,
   CListGroup,
   CListGroupItem,
+  CCardFooter,
+  CButton,
 } from "@coreui/react";
-import React, { Component } from "react";
-import web3 from "../../web3.js";
+
+//MATERIAL-UI
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogActions from "@material-ui/core/DialogActions";
+import AmountToRotateRotationDialog from "./AmountToRotateRotationDialog.js";
 
 // since in order to have contract you need you have the other participant
 // as a friend first, plus you cannot rotate "0" debt, I'm creating the list from
@@ -22,8 +32,23 @@ export class ChooseFriendsForRotationRequest extends Component {
       contractsList: [],
       allContracts: [],
       listInformation: {},
+      peopleUserOwesTo: {},
+      peopleOweToUser: {},
+      selectedDebtor: null,
+      selectedCreditor: null,
+      amountSelected: 0,
+      openRotationSelectAmount: false,
+      amountToRotate: 0,
     };
     // this.onCheckMyContracts = this.onCheckMyContracts.bind(this);
+    this.debtorSelected = this.debtorSelected.bind(this);
+    this.creditorSelected = this.creditorSelected.bind(this);
+    this.handleOpenRotationSelectAmount = this.handleOpenRotationSelectAmount.bind(
+      this
+    );
+    this.handleCloseRotationSelectAmount = this.handleCloseRotationSelectAmount.bind(
+      this
+    );
   }
 
   //////////////////////////////////////////////////////////////////////////////////////
@@ -79,13 +104,25 @@ export class ChooseFriendsForRotationRequest extends Component {
         debt: debtAmount,
         isInDebt: isInDebt,
       };
-      let newListInformation = {
-        ...this.state.listInformation,
-        [x]: binaryContractInstance,
-      };
-      this.setState({
-        listInformation: newListInformation,
-      });
+      if (binaryContractInstance.isInDebt === "danger") {
+        let newListInformation = {
+          ...this.state.peopleUserOwesTo,
+          [x]: binaryContractInstance,
+        };
+
+        this.setState({
+          peopleUserOwesTo: newListInformation,
+        });
+      } else {
+        let newListInformation = {
+          ...this.state.peopleOweToUser,
+          [x]: binaryContractInstance,
+        };
+
+        this.setState({
+          peopleOweToUser: newListInformation,
+        });
+      }
     }
   };
   //////////////////////////////////////////////////////////////////////////////////////
@@ -99,84 +136,117 @@ export class ChooseFriendsForRotationRequest extends Component {
     this.onCheckMyContracts();
   }
 
+  debtorSelected = (selectedDebtor) => (ev) => {
+    this.setState({ selectedDebtor });
+    this.setState((prevState) => {
+      return { amountSelected: prevState.amountSelected + 1 };
+    });
+  };
+  creditorSelected = (selectedCreditor) => (ev) => {
+    this.setState({ selectedCreditor });
+    this.setState((prevState) => {
+      return { amountSelected: prevState.amountSelected + 1 };
+    });
+  };
+
+  handleOpenRotationSelectAmount = () => {
+    this.setState({ openRotationSelectAmount: true });
+  };
+  handleCloseRotationSelectAmount = () => {
+    this.setState({ openRotationSelectAmount: false });
+  };
+
   render() {
-    console.log(this);
+    // console.log(this);
+
+    const peopleOweToUser = [];
+    const peopleUserOwesTo = [];
+
+    for (const [index, value] of Object.entries(this.state.peopleOweToUser)) {
+      peopleOweToUser.push(
+        <CListGroupItem
+          accent="success"
+          color="success"
+          key={index}
+          className={index === this.state.selectedDebtor ? "selected" : ""}
+          onClick={this.debtorSelected(index)}
+        >
+          {value.friendsAddress}: <b>{value.debt}</b>
+        </CListGroupItem>
+      );
+    }
+    for (const [index, value] of Object.entries(this.state.peopleUserOwesTo)) {
+      peopleUserOwesTo.push(
+        <CListGroupItem
+          accent="danger"
+          color="danger"
+          key={index}
+          className={index === this.state.selectedCreditor ? "selected" : ""}
+          onClick={this.creditorSelected(index)}
+        >
+          {value.friendsAddress}: <b>{value.debt}</b>
+        </CListGroupItem>
+      );
+    }
     return (
       <div>
-        <CRow>
-          <CCol xs="6" xl="6" className="card_width">
-            <CCard>
-              <CCardHeader className="green_text card_width">
-                List group
-                <small> accent with color</small>
-              </CCardHeader>
-              <CCardBody className="card_body_items_width">
-                <CListGroup accent>
-                  <CListGroupItem accent="primary" color="primary">
-                    This is a primary list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="secondary" color="secondary">
-                    This is a secondary list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="success" color="success">
-                    This is a success list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="danger" color="danger">
-                    This is a danger list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="warning" color="warning">
-                    This is a warning list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="info" color="info">
-                    This is a info list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="light" color="light">
-                    This is a light list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="dark" color="dark">
-                    This is a dark list group item
-                  </CListGroupItem>
-                </CListGroup>
-              </CCardBody>
-            </CCard>
-          </CCol>
-          <CCol xs="6" xl="6" className="card_width">
-            <CCard>
-              <CCardHeader className="red_text card_width">
-                List group
-                <small> accent with color</small>
-              </CCardHeader>
-              <CCardBody className="card_body_items_width">
-                <CListGroup accent>
-                  <CListGroupItem accent="primary" color="primary">
-                    This is a primary list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="secondary" color="secondary">
-                    This is a secondary list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="success" color="success">
-                    This is a success list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="danger" color="danger">
-                    This is a danger list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="warning" color="warning">
-                    This is a warning list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="info" color="info">
-                    This is a info list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="light" color="light">
-                    This is a light list group item
-                  </CListGroupItem>
-                  <CListGroupItem accent="dark" color="dark">
-                    This is a dark list group item
-                  </CListGroupItem>
-                </CListGroup>
-              </CCardBody>
-            </CCard>
-          </CCol>
-        </CRow>
+        <CCard>
+          <CCardBody>
+            <CRow>
+              <CCol xs="6" xl="6" className="card_width scrollable max_height">
+                <CCard>
+                  <CCardHeader className="green_text card_width">
+                    They owe you
+                  </CCardHeader>
+                  <CCardBody className="card_body_items_width">
+                    <CListGroup>{peopleOweToUser}</CListGroup>
+                  </CCardBody>
+                </CCard>
+              </CCol>
+              <CCol xs="6" xl="6" className="card_width scrollable max_height">
+                <CCard>
+                  <CCardHeader className="red_text card_width">
+                    You owe them
+                  </CCardHeader>
+                  <CCardBody className="card_body_items_width">
+                    <CListGroup>{peopleUserOwesTo}</CListGroup>
+                  </CCardBody>
+                </CCard>
+              </CCol>
+            </CRow>
+          </CCardBody>
+          <CCardFooter
+            className="footer_contract_list_element"
+            style={{ textAlign: "center" }}
+          >
+            <CButton
+              size="sm"
+              color="dark"
+              className="buttons_inside_contract_list "
+              disabled={this.state.amountSelected >= 2 ? false : true}
+              onClick={this.handleOpenRotationSelectAmount}
+            >
+              continue
+            </CButton>
+            <Dialog
+              open={this.state.openRotationSelectAmount}
+              onClose={this.handleCloseRotationSelectAmount}
+              aria-labelledby="form-dialog-title"
+            >
+              <DialogContent>
+                <AmountToRotateRotationDialog
+                  selectedDebtor={
+                    this.state.peopleOweToUser[this.state.selectedDebtor]
+                  }
+                  selectedCreditor={
+                    this.state.peopleUserOwesTo[this.state.selectedCreditor]
+                  }
+                  handleClose={this.handleCloseRotationSelectAmount}
+                />
+              </DialogContent>
+            </Dialog>
+          </CCardFooter>
+        </CCard>
       </div>
     );
   }
