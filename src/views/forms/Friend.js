@@ -47,10 +47,7 @@ export class Friend extends Component {
             Add Debt
           </DialogTitle>
           <DialogContent>
-            <AddDebt
-              {...this.props}
-              handleCloseAddDebt={this.handleCloseAddDebt}
-            />
+            <AddDebt {...this.props} handleClose={this.handleCloseAddDebt} />
           </DialogContent>
         </Dialog>
       </div>

@@ -88,7 +88,7 @@ export class AddDebt extends Component {
       batch.execute();
     }
 
-    // this.props.handleCloseAddDebt();
+    this.props.handleClose();
   };
 
   //////////////////////////////////////////////////////////////////////////////////////
