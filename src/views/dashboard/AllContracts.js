@@ -46,7 +46,7 @@ export class AllContracts extends Component {
       let allTransactions = await tempC.methods.getAllTransations().call();
       // console.log(allTransactions);
       let typeOfCard =
-        creditorName === this.props.playerOne ? "success" : "danger";
+        creditorName === this.props.playerOne ? "danger" : "success";
       let binaryContractInstance = {
         allTransactions: allTransactions,
         typeOfCard: typeOfCard,
