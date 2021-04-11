@@ -114,86 +114,64 @@ export class TheHeaderDropdownNotif extends Component {
           <CIcon name="cil-bell" />
           {totalBadge}
         </CDropdownToggle>
-        <CDropdownMenu
-          placement="bottom-end"
-          className="pt-0"
-          style={{ minWidth: "12rem" }}
-        >
+        <CDropdownMenu placement="bottom-end" className="pt-0">
           <CDropdownItem header tag="div" className="text-center" color="light">
             <strong>
               You have {this.props.totalRequests} {plural}
             </strong>
           </CDropdownItem>
 
-          {sumFriendRequests !== 0 ? (
-            <CDropdownItem>
-              <CLink
-                to={{
-                  pathname: "/friend_requests",
-                  requestProps: {
-                    compiledBinaryContract: this.props.compiledBinaryContract,
-                  },
-                }}
-                className="text-success"
-              >
-                <CIcon name="cil-user-follow" className="mr-2 text-success" />
-                Friend Request
-              </CLink>
-              <CBadge
-                color="danger"
-                className="mfs-auto"
-                style={{ fontSize: "12px" }}
-              >
-                {friendBadge}
-              </CBadge>
-            </CDropdownItem>
-          ) : (
-            ""
-          )}
-
-          {sumDebtRequests !== 0 ? (
-            <CDropdownItem>
-              <CLink
-                to={{
-                  pathname: "/debt_requests",
-                  requestProps: {
-                    compiledBinaryContract: this.props.compiledBinaryContract,
-                  },
-                }}
-                className="text-info"
-              >
-                <CIcon name="cil-chart-pie" className="mfe-2 mr-2 text-info" />{" "}
-                Exchange request
-              </CLink>
-              <CBadge color="danger" className="mfs-auto">
-                {debtBadge}
-              </CBadge>
-            </CDropdownItem>
-          ) : (
-            ""
-          )}
-
-          {sumRotationRequests !== 0 ? (
-            <CDropdownItem>
-              <CLink
-                to={{
-                  pathname: "/rotation_requests",
-                  requestProps: {
-                    compiledBinaryContract: this.props.compiledBinaryContract,
-                  },
-                }}
-                className="text-primary"
-              >
-                <CIcon name="cil-arrow-right" className="mr-2 text-primary" />
-                Rotation request
-              </CLink>
-              <CBadge color="danger" className="mfs-auto">
-                {rotationBadge}
-              </CBadge>
-            </CDropdownItem>
-          ) : (
-            ""
-          )}
+          <CDropdownItem>
+            <CLink
+              to={{
+                pathname: "/friend_requests",
+                requestProps: {
+                  compiledBinaryContract: this.props.compiledBinaryContract,
+                },
+              }}
+              className="text-success"
+            >
+              <CIcon name="cil-user-follow" className="mr-2 text-success" />
+              Friend Request
+            </CLink>
+            <CBadge color="danger" className="mfs-auto">
+              {friendBadge}
+            </CBadge>
+          </CDropdownItem>
+          <CDropdownItem>
+            <CLink
+              to={{
+                pathname: "/debt_requests",
+                requestProps: {
+                  compiledBinaryContract: this.props.compiledBinaryContract,
+                },
+              }}
+              className="text-info"
+            >
+              <CIcon name="cil-chart-pie" className="mfe-2 mr-2 text-info" />{" "}
+              Exchange request
+            </CLink>
+            <CBadge color="danger" className="mfs-auto">
+              {debtBadge}
+            </CBadge>
+          </CDropdownItem>
+          <CDropdownItem>
+            <CLink
+              to={{
+                pathname: "/rotation_requests",
+                requestProps: {
+                  compiledBinaryContract: this.props.compiledBinaryContract,
+                },
+              }}
+              className="text-primary"
+            >
+              <CIcon name="cil-arrow-right" className="mr-2 text-primary" />
+              Rotation request
+            </CLink>
+            <CBadge color="danger" className="mfs-auto">
+              {rotationBadge}
+            </CBadge>
+          </CDropdownItem>
         </CDropdownMenu>
       </CDropdown>
     );

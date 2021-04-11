@@ -34,6 +34,7 @@ export class DebtRequest extends Component {
       let currentDebtOfCurrentBinaryContract = await currentBinaryContract.methods
         .getCurrentDebt()
         .call();
+
       let accountsOfTransaction = [this.props.destination, this.props.source];
 
       if (
@@ -45,7 +46,6 @@ export class DebtRequest extends Component {
         )
       ) {
         // it means that the contract already exist
-
         await currentBinaryContract.methods
           .addTransaction(
             this.props.destination,
@@ -65,7 +65,7 @@ export class DebtRequest extends Component {
 
     if (!contractExisted) {
       // deploy a binaryContract
-      await this.state.profile.methods
+      await this.props.profile.methods
         .createBinaryContract(
           this.props.destination,
           this.props.amount,
@@ -194,7 +194,7 @@ export class DebtRequest extends Component {
   };
 
   render() {
-    // console.log(this);
+    console.log(this);
     let bodyMessage = "";
     let topMessage = "";
     const buttons = [];

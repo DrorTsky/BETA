@@ -63,17 +63,6 @@ export class Contract extends Component {
         ? this.state.debtor
         : this.state.creditor;
 
-    // let message =
-    //   this.state.typeOfCard === "danger" ? (
-    //     <CCardHeader>
-    //       <b>you owe</b> {headerName}
-    //     </CCardHeader>
-    //   ) : (
-    //     <CCardHeader>
-    //       {headerName}
-    //       <br /> <b>owes you</b>
-    //     </CCardHeader>
-    //   );
     let message = "";
     let cardTextStyle = "";
     if (this.state.typeOfCard === "danger") {
@@ -93,11 +82,8 @@ export class Contract extends Component {
       );
     }
 
-    // console.log(this);
     return (
       <div>
-        {/* <CCard color={this.state.typeOfCard} className="text-white text-center"> */}
-        {/* <CCard className="text-white text-center"> */}
         <CCard className={cardTextStyle}>
           {message}
           <CCardBody>
@@ -156,7 +142,8 @@ export class Contract extends Component {
                 <DialogContent>
                   <AddDebt
                     {...this.props}
-                    friendAddress={this.props.playerTwo}
+                    friendAddress={headerName}
+                    handleClose={this.handleCloseAddDebt}
                   />
                 </DialogContent>
               </Dialog>
