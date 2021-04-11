@@ -11,7 +11,6 @@ import {
   CFormText,
   CRow,
 } from "@coreui/react";
-import { FALSE } from "node-sass";
 
 export class AmountToRotateRotationDialog extends Component {
   constructor(props) {

@@ -9,11 +9,10 @@ export class Rotation extends Component {
   }
 
   render() {
+    console.log(this);
     return (
       <div>
-        <ChooseFriendsForRotationRequest
-          {...this.props}
-        ></ChooseFriendsForRotationRequest>
+        <ChooseFriendsForRotationRequest {...this.props} />{" "}
       </div>
     );
   }

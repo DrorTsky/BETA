@@ -34,9 +34,10 @@ export class ChooseFriendsForRotationRequest extends Component {
       listInformation: {},
       peopleUserOwesTo: {},
       peopleOweToUser: {},
-      selectedDebtor: null,
-      selectedCreditor: null,
-      amountSelected: 0,
+      selectedDebtor: "",
+      selectedCreditor: "",
+      isDebtorSelected: false,
+      isCreditorSelected: false,
       openRotationSelectAmount: false,
       amountToRotate: 0,
     };
@@ -49,6 +50,7 @@ export class ChooseFriendsForRotationRequest extends Component {
     this.handleCloseRotationSelectAmount = this.handleCloseRotationSelectAmount.bind(
       this
     );
+    // this.onCheckMyContracts = this.onCheckMyContracts.bind(this);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +90,7 @@ export class ChooseFriendsForRotationRequest extends Component {
       let friendsAddress;
       let friendsName;
       let isInDebt;
-      if (creditorAddress === this.props.playerOne) {
+      if (creditorAddress !== this.props.playerOne) {
         friendsAddress = creditorAddress;
         isInDebt = "success";
         //TODO get friends name from server
@@ -139,13 +141,13 @@ export class ChooseFriendsForRotationRequest extends Component {
   debtorSelected = (selectedDebtor) => (ev) => {
     this.setState({ selectedDebtor });
     this.setState((prevState) => {
-      return { amountSelected: prevState.amountSelected + 1 };
+      return { isDebtorSelected: true };
     });
   };
   creditorSelected = (selectedCreditor) => (ev) => {
     this.setState({ selectedCreditor });
     this.setState((prevState) => {
-      return { amountSelected: prevState.amountSelected + 1 };
+      return { isCreditorSelected: true };
     });
   };
 
@@ -157,12 +159,13 @@ export class ChooseFriendsForRotationRequest extends Component {
   };
 
   render() {
-    // console.log(this);
+    console.log(this);
 
     const peopleOweToUser = [];
     const peopleUserOwesTo = [];
 
     for (const [index, value] of Object.entries(this.state.peopleOweToUser)) {
+      console.log(this.state.peopleOweToUser);
       peopleOweToUser.push(
         <CListGroupItem
           accent="success"
@@ -170,6 +173,7 @@ export class ChooseFriendsForRotationRequest extends Component {
           key={index}
           className={index === this.state.selectedDebtor ? "selected" : ""}
           onClick={this.debtorSelected(index)}
+          style={{ borderTopWidth: "2px" }}
         >
           {value.friendsAddress}: <b>{value.debt}</b>
         </CListGroupItem>
@@ -183,6 +187,7 @@ export class ChooseFriendsForRotationRequest extends Component {
           key={index}
           className={index === this.state.selectedCreditor ? "selected" : ""}
           onClick={this.creditorSelected(index)}
+          style={{ borderTopWidth: "2px" }}
         >
           {value.friendsAddress}: <b>{value.debt}</b>
         </CListGroupItem>
@@ -223,7 +228,11 @@ export class ChooseFriendsForRotationRequest extends Component {
               size="sm"
               color="dark"
               className="buttons_inside_contract_list "
-              disabled={this.state.amountSelected >= 2 ? false : true}
+              disabled={
+                this.state.isCreditorSelected && this.state.isDebtorSelected
+                  ? false
+                  : true
+              }
               onClick={this.handleOpenRotationSelectAmount}
             >
               continue
