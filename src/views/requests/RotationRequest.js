@@ -1,14 +1,313 @@
 import React, { Component } from "react";
+import web3 from "../../web3.js";
+import profileAbi from "../../profile";
+
+import {
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CRow,
+  CCol,
+  CButton,
+} from "@coreui/react";
+
+import Brightness1TwoToneIcon from "@material-ui/icons/Brightness1TwoTone";
+
+var debtRequestType = {
+  debtRequest: "0",
+  debtRotationRequest: "1",
+};
+
+var debtRotationStatus = {
+  MediatorAgreed: "0",
+  CreditorAgreed: "1",
+  DebtorAgreed: "2",
+  Done: "3",
+};
 
 export class RotationRequest extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      isMediator: false,
+      isDebtor: false,
+      isCreditor: false,
+      statusToSend: "0",
+      addressToGetIndexFrom: "",
+    };
+    this.findParticipantsExchangeIndex = this.findParticipantsExchangeIndex.bind(
+      this
+    );
+    this.confirmRotationRequest = this.confirmRotationRequest.bind(this);
+    this.sendRotationRequestSingle = this.sendRotationRequestSingle.bind(this);
+    this.mediatorsFinalAccept = this.mediatorsFinalAccept.bind(this);
+    this.checkIfContractExists = this.checkIfContractExists.bind(this);
   }
 
+  componentDidMount() {
+    if (this.props.playerOne === this.props.exchange.debtRotation.mediator) {
+      this.setState({ isMediator: true });
+    } else if (
+      this.props.playerOne === this.props.exchange.debtRotation.creditor
+    ) {
+      this.setState({
+        isCreditor: true,
+        statusToSend: debtRotationStatus.creditorAgreed,
+        addressToGetIndexFrom: this.props.exchange.debtRotation.debtor,
+      });
+    } else {
+      this.setState({
+        isDebtor: true,
+        statusToSend: debtRotationStatus.DebtorAgreed,
+        addressToGetIndexFrom: this.props.exchange.debtRotation.creditor,
+      });
+    }
+  }
+  //********************************************************
+  // MEDIATORS ACCEPT
+  //********************************************************
+  checkIfContractExists = async (profile, debtorsAddress, creditorsAddress) => {
+    let contracts = await profile.methods.getContracts().call();
+    for (var index = 0; index < contracts.length; index++) {
+      let contract = await profile.methods.getContractsByIndex(index).call();
+      let tempC = await new web3.eth.Contract(
+        JSON.parse(this.props.compiledBinaryContract.interface),
+        contract
+      );
+      let creditorName = await tempC.methods.getCurrentCreditorAddress().call();
+      let debtorName = await tempC.methods.getCurrentDebtorAddress().call();
+      if (
+        creditorName === debtorsAddress ||
+        creditorName === creditorsAddress
+      ) {
+        if (debtorName === debtorsAddress || debtorName === creditorsAddress) {
+          return true;
+          // console.log("true");
+        }
+      }
+      // console.log(`creditor: ${creditorName}, debtor:${debtorName}`);
+    }
+    // console.log("false");
+    return false;
+  };
+  mediatorsFinalAccept = async () => {
+    // get profiles
+    const debtorsProfile = new web3.eth.Contract(
+      profileAbi,
+      this.props.exchange.debtRotation.debtor
+    );
+    const creditorsProfile = new web3.eth.Contract(
+      profileAbi,
+      this.props.exchange.debtRotation.creditor
+    );
+    // get indexes
+    let debtorsIndex = await this.findParticipantsExchangeIndex(
+      this.props.exchange.debtRotation.debtor
+    );
+    let creditorsIndex = await this.findParticipantsExchangeIndex(
+      this.props.exchange.debtRotation.creditor
+    );
+    // check if debtor has a binary contract with creditor
+    let isContract = await this.checkIfContractExists(
+      debtorsProfile,
+      this.props.exchange.debtRotation.debtor,
+      this.props.exchange.debtRotation.creditor
+    );
+    // if not, create one
+    if (!isContract) {
+      console.log("TODO ");
+    }
+    //transfer debt between creditor and debtor
+
+    //transfer debt between debtor and mediator
+
+    //transfer debt between mediator and creditor
+
+    //remove rotation exchanges
+  };
+  //********************************************************
+  // ROTATION NON MEDIATOR PARTICIPANTS
+  //********************************************************
+
+  // FIND EXCHANGE INDEX
+  findParticipantsExchangeIndex = async (address) => {
+    const profile = new web3.eth.Contract(profileAbi, address);
+    const addresses = await profile.methods.getAllExchanges().call();
+    for (var index = 0; index < addresses.length; index++) {
+      let exchange = await profile.methods.getAllExchangesByIndex(index).call();
+      if (
+        this.props.exchange.debtRotation.debtor ===
+          exchange.debtRotation.debtor &&
+        this.props.exchange.debtRotation.creditor ===
+          exchange.debtRotation.creditor &&
+        this.props.exchange.debtRotation.mediator ===
+          exchange.debtRotation.mediator &&
+        this.props.exchange.debtRotation.amount === exchange.debtRotation.amount
+      )
+        return index;
+    }
+  };
+  //  SEND A ROTATION EXCHANGE
+  sendRotationRequestSingle = async (profile, index, accounts) => {
+    await profile.methods
+      .addDebtRotationRequestNotRestricted(
+        this.props.exchange.debtRotation.mediator,
+        this.props.exchange.debtRotation.creditor,
+        this.props.exchange.debtRotation.debtor,
+        this.props.exchange.debtRotation.amount,
+        this.state.statusToSend,
+        index
+      )
+      .send({ from: accounts[0], gas: "1000000" });
+  };
+  // CONFIRM REQUEST
+  confirmRotationRequest = async () => {
+    let accounts = await web3.eth.getAccounts();
+    const mediatorsProfile = new web3.eth.Contract(
+      profileAbi,
+      this.props.exchange.debtRotation.mediator
+    );
+    const otherProfile = new web3.eth.Contract(
+      profileAbi,
+      this.state.addressToGetIndexFrom
+    );
+
+    let mediatorsIndex = await this.findParticipantsExchangeIndex(
+      this.props.exchange.debtRotation.mediator
+    );
+    // console.log(mediatorsIndex);
+    let otherParticipantsIndex = await this.findParticipantsExchangeIndex(
+      this.state.addressToGetIndexFrom
+    );
+    // console.log(otherParticipantsIndex);
+
+    await this.sendRotationRequestSingle(
+      this.props.profile,
+      this.props.index,
+      accounts
+    ); //this profile
+    await this.sendRotationRequestSingle(
+      mediatorsProfile,
+      mediatorsIndex,
+      accounts
+    ); //mediators profile, mediator is not going through this process
+    await this.sendRotationRequestSingle(
+      otherProfile,
+      otherParticipantsIndex,
+      accounts
+    ); //third and final participant
+  };
+
   render() {
-    return <div></div>;
+    console.log(this);
+    const headerMessage = this.state.isMediator
+      ? "You requested a rotation with:"
+      : `${this.props.exchange.debtRotation.mediator} requested a rotation`;
+    //********************************************************
+    //PROGRESS STATUS
+    //********************************************************
+    const progress = [];
+    for (let index = 0; index <= 2; index++) {
+      if (index <= parseInt(this.props.exchange.debtRotation.status)) {
+        progress.push(
+          <CCol key={index} xs="4">
+            <Brightness1TwoToneIcon
+              key={index}
+              fontSize="large"
+              style={{ color: "green" }}
+            />
+          </CCol>
+        );
+      } else {
+        progress.push(
+          <CCol key={index} xs="4">
+            <Brightness1TwoToneIcon
+              key={index}
+              fontSize="large"
+              color="action"
+            />
+          </CCol>
+        );
+      }
+    }
+    //********************************************************
+    //BUTTONS
+    //********************************************************
+    const buttons = [];
+    if (
+      this.state.isMediator &&
+      this.props.exchange.debtRotation.status === debtRotationStatus.Done
+    ) {
+      buttons.push(
+        <CButton
+          key="confirm"
+          size="sm"
+          color="secondary"
+          className="buttons_inside_contract_list"
+          // onClick={this.confirmFriendRequest}
+        >
+          confirm
+        </CButton>
+      );
+    }
+    if (this.props.exchange.debtRotation.status !== debtRotationStatus.Done) {
+      if (
+        (this.state.isDebtor &&
+          this.props.exchange.debtRotation.status !==
+            debtRotationStatus.DebtorAgreed) ||
+        (this.state.isCreditor &&
+          this.props.exchange.debtRotation.status !==
+            debtRotationStatus.CreditorAgreed)
+      ) {
+        buttons.push(
+          <div>
+            <CButton
+              key="confirm"
+              size="sm"
+              color="secondary"
+              className="buttons_inside_contract_list"
+              onClick={this.confirmRotationRequest}
+            >
+              confirm
+            </CButton>
+            <CButton
+              key="refuse"
+              size="sm"
+              color="dark"
+              className="buttons_inside_contract_list"
+              // onClick={this.confirmFriendRequest}
+            >
+              refuse
+            </CButton>
+          </div>
+        );
+      }
+    }
+    return (
+      <div>
+        <CCard color="info" className="text-white text-center">
+          <CCardHeader>{headerMessage}</CCardHeader>
+          <CCardBody>
+            <blockquote className="card-bodyquote">
+              <h6>{this.props.exchange.debtRotation.creditor}</h6>
+              <br />
+              <h6>{this.props.exchange.debtRotation.debtor}</h6>
+              <br />
+              <h3>for: {this.props.exchange.debtRotation.amount}</h3>
+              {this.props.creationDate}
+            </blockquote>
+            <CCard style={{ marginBottom: "10px", height: "50px" }}>
+              <CCardBody style={{ padding: "8px" }}>
+                <CRow>{progress}</CRow>
+              </CCardBody>
+            </CCard>
+            <footer className="footer_contract_list_element">{buttons}</footer>
+            <button onClick={this.mediatorsFinalAccept}>test</button>
+          </CCardBody>
+        </CCard>
+      </div>
+    );
   }
 }
 

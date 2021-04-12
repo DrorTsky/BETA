@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-
+import web3 from "../../web3.js";
+import profileAbi from "../../profile";
 import {
   CCard,
   CCardBody,
@@ -12,6 +13,18 @@ import {
   CRow,
 } from "@coreui/react";
 
+// var debtRequestType = {
+//   debtRequest: "0",
+//   debtRotationRequest: "1",
+// };
+
+var debtRotationStatus = {
+  MediatorAgreed: "0",
+  ReceiverAgreed: "1",
+  SenderAgreed: "2",
+  Done: "3",
+};
+
 export class AmountToRotateRotationDialog extends Component {
   constructor(props) {
     super(props);
@@ -19,11 +32,14 @@ export class AmountToRotateRotationDialog extends Component {
     this.state = { amountToRotate: 0, maxAmountToRotate: 0 };
     this.onChangeFormInput = this.onChangeFormInput.bind(this);
     this.submitRotation = this.submitRotation.bind(this);
+    this.generateDebtRotation = this.generateDebtRotation.bind(this);
+    // this.findDebtIndex = this.findDebtIndex.bind(this);
   }
 
   submitRotation = (event) => {
     event.preventDefault();
     // console.log(this);
+    this.generateDebtRotation();
     this.props.handleClose();
   };
 
@@ -36,6 +52,65 @@ export class AmountToRotateRotationDialog extends Component {
 
     this.setState({ maxAmountToRotate: maxAmountToRotate });
   }
+
+  generateDebtRotation = async () => {
+    let accounts = await web3.eth.getAccounts();
+    const creditorProfile = new web3.eth.Contract(
+      profileAbi,
+      this.props.selectedCreditor.friendsAddress
+    );
+    const debtorProfile = new web3.eth.Contract(
+      profileAbi,
+      this.props.selectedDebtor.friendsAddress
+    );
+    // let allExchanges = await this.props.profile.methods
+    //   .getAllExchanges()
+    //   .call();
+    // console.log(allExchanges);
+    // let lastDebtRotationRequestIndex = this.findDebtIndex(
+    //   allExchanges,
+    //   this.props.selectedCreditor,
+    //   this.props.mediatorAddress,
+    //   this.props.selectedDebtor,
+    //   debtRequestType.debtRotationRequest
+    // );
+    // console.log(lastDebtRotationRequestIndex);
+    console.log(
+      `${this.props.mediatorAddress} , ${this.props.selectedCreditor.friendsAddress}, ${this.props.selectedDebtor.friendsAddress}, ${this.state.amountToRotate}`
+    );
+
+    await this.props.profile.methods
+      .addDebtRotationRequestNotRestricted(
+        this.props.mediatorAddress,
+        this.props.selectedCreditor.friendsAddress,
+        this.props.selectedDebtor.friendsAddress,
+        this.state.amountToRotate,
+        debtRotationStatus.MediatorAgreed,
+        0
+      )
+      .send({ from: accounts[0], gas: "1000000" });
+    await debtorProfile.methods
+      .addDebtRotationRequestNotRestricted(
+        this.props.mediatorAddress,
+        this.props.selectedCreditor.friendsAddress,
+        this.props.selectedDebtor.friendsAddress,
+        this.state.amountToRotate,
+        debtRotationStatus.MediatorAgreed,
+        0
+      )
+      .send({ from: accounts[0], gas: "1000000" });
+    await creditorProfile.methods
+      .addDebtRotationRequestNotRestricted(
+        this.props.mediatorAddress,
+        this.props.selectedCreditor.friendsAddress,
+        this.props.selectedDebtor.friendsAddress,
+        this.state.amountToRotate,
+        debtRotationStatus.MediatorAgreed,
+        0
+      )
+      .send({ from: accounts[0], gas: "1000000" });
+  };
+
   // *****************************************************
   //                  FORM CHANGE HANDLERS
   // *****************************************************
@@ -55,7 +130,7 @@ export class AmountToRotateRotationDialog extends Component {
   }
 
   render() {
-    // console.log(this);
+    console.log(this);
     return (
       <div>
         <CCard>
