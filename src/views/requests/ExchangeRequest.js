@@ -24,7 +24,9 @@ export class ExchangeRequest extends Component {
         <FriendRequest key={this.props.creationDate} {...friendProps} />
       );
     } else if (this.props.exchangePurpose === "2") {
-      exchanges.push(<RotationRequest key={this.props.creationDate} />);
+      exchanges.push(
+        <RotationRequest key={this.props.creationDate} {...this.props} />
+      );
     }
 
     return <div>{exchanges}</div>;
