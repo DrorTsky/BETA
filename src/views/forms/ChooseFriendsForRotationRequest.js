@@ -171,11 +171,15 @@ export class ChooseFriendsForRotationRequest extends Component {
           accent="success"
           color="success"
           key={index}
-          className={index === this.state.selectedDebtor ? "selected" : ""}
-          onClick={this.debtorSelected(index)}
+          className={
+            index === this.state.selectedDebtor
+              ? "selected group_item_padding"
+              : "group_item_padding"
+          }
           style={{ borderTopWidth: "2px" }}
+          onClick={this.debtorSelected(index)}
         >
-          {value.friendsAddress}: <b>{value.debt}</b>
+          {value.friendsAddress}:<br /> <b>{value.debt}</b>
         </CListGroupItem>
       );
     }
@@ -185,11 +189,19 @@ export class ChooseFriendsForRotationRequest extends Component {
           accent="danger"
           color="danger"
           key={index}
-          className={index === this.state.selectedCreditor ? "selected" : ""}
-          onClick={this.creditorSelected(index)}
+          className={
+            index === this.state.selectedCreditor
+              ? "selected group_item_padding"
+              : "group_item_padding"
+          }
           style={{ borderTopWidth: "2px" }}
+          onClick={this.creditorSelected(index)}
         >
-          {value.friendsAddress}: <b>{value.debt}</b>
+          {/* <CCard style={{ marginBottom: "0px" }}>
+            <CCardHeader>{value.debt}</CCardHeader>
+            <CCardBody>{value.friendsAddress}</CCardBody>
+          </CCard> */}
+          {value.friendsAddress}:<br /> <b>{value.debt}</b>
         </CListGroupItem>
       );
     }
