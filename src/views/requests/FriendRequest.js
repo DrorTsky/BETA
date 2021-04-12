@@ -195,25 +195,7 @@ export class FriendRequest extends Component {
               {this.props.creationDate}
             </blockquote>
 
-            <footer className="footer_contract_list_element">
-              {/* <CButton
-                size="sm"
-                color="secondary"
-                className="buttons_inside_contract_list"
-                onClick={this.confirmFriendRequest}
-              >
-                accept
-              </CButton>
-              <CButton
-                size="sm"
-                color="dark"
-                className="buttons_inside_contract_list"
-                onClick={this.declineFriendRequest}
-              >
-                refuse
-              </CButton> */}
-              {buttons}
-            </footer>
+            <footer className="footer_contract_list_element">{buttons}</footer>
           </CCardBody>
         </CCard>
       </div>
