@@ -104,7 +104,7 @@ export class AddDebt extends Component {
     this.setState({ [name]: value });
   }
   render() {
-    console.log(this);
+    // console.log(this);
     return (
       <div>
         <CCard>
