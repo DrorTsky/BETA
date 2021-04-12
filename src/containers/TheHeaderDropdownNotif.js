@@ -115,7 +115,13 @@ export class TheHeaderDropdownNotif extends Component {
           {totalBadge}
         </CDropdownToggle>
         <CDropdownMenu placement="bottom-end" className="pt-0">
-          <CDropdownItem header tag="div" className="text-center" color="light">
+          <CDropdownItem
+            header
+            tag="div"
+            className="text-center"
+            color="light"
+            style={{ minWidth: "13rem" }}
+          >
             <strong>
               You have {this.props.totalRequests} {plural}
             </strong>
@@ -148,7 +154,7 @@ export class TheHeaderDropdownNotif extends Component {
               }}
               className="text-info"
             >
-              <CIcon name="cil-chart-pie" className="mfe-2 mr-2 text-info" />{" "}
+              <CIcon name="cil-chart-pie" className="mfe-2 mr-2 text-info" />
               Exchange request
             </CLink>
             <CBadge color="danger" className="mfs-auto">
