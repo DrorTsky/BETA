@@ -250,6 +250,8 @@ export class ChooseFriendsForRotationRequest extends Component {
                   selectedCreditor={
                     this.state.peopleUserOwesTo[this.state.selectedCreditor]
                   }
+                  mediatorAddress={this.props.address}
+                  profile={this.props.profile}
                   handleClose={this.handleCloseRotationSelectAmount}
                 />
               </DialogContent>
