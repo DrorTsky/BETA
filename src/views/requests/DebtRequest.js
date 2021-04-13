@@ -10,7 +10,28 @@ export class DebtRequest extends Component {
     this.state = {};
     this.confirmDebtRequest = this.confirmDebtRequest.bind(this);
     this.declineDebtRequest = this.declineDebtRequest.bind(this);
+    this.findParticipantsExchangeIndex = this.findParticipantsExchangeIndex.bind(
+      this
+    );
   }
+
+  // FIND EXCHANGE INDEX
+  findParticipantsExchangeIndex = async (address) => {
+    const profile = new web3.eth.Contract(profileAbi, address);
+    const addresses = await profile.methods.getAllExchanges().call();
+    // console.log(addresses.length);
+    for (var index = 0; index < addresses.length; index++) {
+      let exchange = await profile.methods.getAllExchangesByIndex(index).call();
+      if (
+        this.props.exchange.transaction.from === exchange.transaction.from &&
+        this.props.exchange.transaction.to === exchange.transaction.to &&
+        this.props.exchange.transaction.amount === exchange.transaction.amount
+      ) {
+        // console.log(`succeeded finding index: ${index}`);
+        return index;
+      }
+    }
+  };
 
   confirmDebtRequest = async (event) => {
     event.preventDefault();
@@ -26,11 +47,13 @@ export class DebtRequest extends Component {
 
     for (var i = 0; i < myContracts.length; i++) {
       // in this for loop we try to find if a contract exist, or we should create one
+      let contract = await this.props.profile.methods
+        .getContractsByIndex(this.props.index)
+        .call();
       let currentBinaryContract = await new web3.eth.Contract(
         JSON.parse(this.props.compiledBinaryContract.interface),
-        (existedContractAddress = myContracts[i])
+        contract
       );
-
       let currentDebtOfCurrentBinaryContract = await currentBinaryContract.methods
         .getCurrentDebt()
         .call();
@@ -58,12 +81,14 @@ export class DebtRequest extends Component {
           });
 
         contractExisted = true;
+        console.log("contract exists");
 
         break;
       }
     } // end of for loop - now we know if the contract existed or not
 
     if (!contractExisted) {
+      console.log("creating contract");
       // deploy a binaryContract
       await this.props.profile.methods
         .createBinaryContract(
@@ -83,16 +108,17 @@ export class DebtRequest extends Component {
         .call();
     }
 
-    // let currentBinaryContractAddress = contractExisted
-    //   ? existedContractAddress
-    //   : deployedContractAddress;
-    // let currentBinaryContract = await new web3.eth.Contract(
-    //   JSON.parse(this.props.compiledBinaryContract.interface),
-    //   currentBinaryContractAddress
-    // );
-
-    let friendsProfile = new web3.eth.Contract(profileAbi, this.props.source);
-
+    const friendsAddress =
+      this.props.exchange.transaction.from === this.props.playerOne
+        ? this.props.exchange.transaction.to
+        : this.props.exchange.transaction.from;
+    let friendsProfile = new web3.eth.Contract(profileAbi, friendsAddress);
+    var friendsExchangeIndex = await this.findParticipantsExchangeIndex(
+      friendsAddress
+    );
+    console.log(
+      `friendsAddress: ${friendsAddress},friendsExchangeIndex: ${friendsExchangeIndex} `
+    );
     // we assign a zeroAddress if the contract already existed. Otherwise, the deployed contract address
     let newContractAddress = contractExisted
       ? await this.props.profile.methods.getZeroAddress().call()
@@ -103,12 +129,12 @@ export class DebtRequest extends Component {
 
       // We call this method in order to remove our exchange on the profile (solidity)
       // TODO: when implementing it with the actual frontend, we should send the actual index instead of "0"
-      this.props.profile.methods.confirmDebtRequest(0).send,
+      this.props.profile.methods.confirmDebtRequest(this.props.index).send,
 
       // We call this method in order to remove friend's exchange (solidity method)
       // TODO: when implementing it with the actual frontend, we should send the actual index instead of "0"
       friendsProfile.methods.confirmDebtRequestNotRestricted(
-        0,
+        friendsExchangeIndex,
         newContractAddress
       ).send,
     ]);
@@ -194,7 +220,7 @@ export class DebtRequest extends Component {
   };
 
   render() {
-    // console.log(this);
+    console.log(this);
     let bodyMessage = "";
     let topMessage = "";
     const buttons = [];
