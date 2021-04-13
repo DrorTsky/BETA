@@ -5,7 +5,7 @@ import { TheContent, TheSidebar, TheFooter, TheHeader } from "./index";
 import web3 from "../web3.js";
 import profileAbi from "../profile";
 
-const playerOne = "0x030865da57D5cb3f97653F85E2B11C0ac56F596B";
+const playerOne = "0xc59dBCe5D155D3Ef59D7393996a5252604BF6eF0";
 
 // I make then 2 different variables as I try to make these 2 different scenarios detailed as possible.
 // In our frontend these 2 variables will be the same one
