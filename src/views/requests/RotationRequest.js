@@ -53,7 +53,7 @@ export class RotationRequest extends Component {
     ) {
       this.setState({
         isCreditor: true,
-        statusToSend: debtRotationStatus.creditorAgreed,
+        statusToSend: debtRotationStatus.CreditorAgreed,
         addressToGetIndexFrom: this.props.exchange.debtRotation.debtor,
       });
     } else {
@@ -68,63 +68,164 @@ export class RotationRequest extends Component {
   // MEDIATORS ACCEPT
   //********************************************************
   checkIfContractExists = async (profile, debtorsAddress, creditorsAddress) => {
+    // console.log(
+    //   `debtors address: ${debtorsAddress}, creditors address: ${creditorsAddress}`
+    // );
+    // console.log(profile);
     let contracts = await profile.methods.getContracts().call();
+    // console.log(`contract length: ${contracts.length}`);
+    // console.log(contracts);
     for (var index = 0; index < contracts.length; index++) {
       let contract = await profile.methods.getContractsByIndex(index).call();
+      // console.log(`contract address: ${contract}`);
       let tempC = await new web3.eth.Contract(
         JSON.parse(this.props.compiledBinaryContract.interface),
         contract
       );
       let creditorName = await tempC.methods.getCurrentCreditorAddress().call();
+      // console.log(`creditors name: ${creditorName}`);
       let debtorName = await tempC.methods.getCurrentDebtorAddress().call();
+      // console.log(`debtors name: ${debtorName}`);
       if (
         creditorName === debtorsAddress ||
         creditorName === creditorsAddress
       ) {
         if (debtorName === debtorsAddress || debtorName === creditorsAddress) {
-          return true;
-          // console.log("true");
+          // console.log(`found contract: ${tempC}`);
+          return tempC;
         }
       }
       // console.log(`creditor: ${creditorName}, debtor:${debtorName}`);
     }
     // console.log("false");
-    return false;
+    return undefined;
   };
   mediatorsFinalAccept = async () => {
+    let accounts = await web3.eth.getAccounts();
     // get profiles
     const debtorsProfile = new web3.eth.Contract(
       profileAbi,
       this.props.exchange.debtRotation.debtor
     );
+    // console.log(`debtorsProfile: ${debtorsProfile}`);
     const creditorsProfile = new web3.eth.Contract(
       profileAbi,
       this.props.exchange.debtRotation.creditor
     );
+    // console.log(`debtorsProfile: ${creditorsProfile}`);
     // get indexes
     let debtorsIndex = await this.findParticipantsExchangeIndex(
       this.props.exchange.debtRotation.debtor
     );
+    // console.log(`debtors index: ${debtorsIndex}`);
     let creditorsIndex = await this.findParticipantsExchangeIndex(
       this.props.exchange.debtRotation.creditor
     );
+    // console.log(`creditors index: ${creditorsIndex}`);
     // check if debtor has a binary contract with creditor
     let isContract = await this.checkIfContractExists(
-      debtorsProfile,
+      creditorsProfile,
       this.props.exchange.debtRotation.debtor,
       this.props.exchange.debtRotation.creditor
     );
     // if not, create one
-    if (!isContract) {
-      console.log("TODO ");
+    if (isContract === undefined) {
+      // console.log(`no contract, creating one`);
+      // deploy a binaryContract
+      await creditorsProfile.methods
+        .createBinaryContract(
+          this.props.exchange.debtRotation.debtor,
+          this.props.exchange.debtRotation.amount,
+          this.props.exchange.debtRotation.creditor
+        )
+        .send({
+          from: accounts[0],
+          gas: "4000000",
+        });
+      isContract = await this.checkIfContractExists(
+        creditorsProfile,
+        this.props.exchange.debtRotation.debtor,
+        this.props.exchange.debtRotation.creditor
+      );
+      // console.log(`created a contract: ${isContract}`);
+    } else {
+      //transfer debt between creditor and debtor
+      // console.log(`contract already exists: ${isContract}`);
+      await isContract.methods
+        .addTransaction(
+          this.props.exchange.debtRotation.debtor,
+          this.props.exchange.debtRotation.amount,
+          this.props.exchange.debtRotation.creditor
+        )
+        .send({
+          from: accounts[0],
+          gas: "2000000",
+        });
+      // console.log(`transaction added`);
     }
-    //transfer debt between creditor and debtor
+    //transfer debt between debtor and mediator - debtor transfers to mediator "closing" the debt
+    let debtorMediatorContract = await this.checkIfContractExists(
+      debtorsProfile,
+      this.props.exchange.debtRotation.mediator,
+      this.props.exchange.debtRotation.debtor
+    );
+    // console.log(`mediator - debtor contract: ${debtorMediatorContract}`);
+    await debtorMediatorContract.methods
+      .addTransaction(
+        this.props.exchange.debtRotation.mediator,
+        this.props.exchange.debtRotation.amount,
+        this.props.exchange.debtRotation.debtor
+      )
+      .send({
+        from: accounts[0],
+        gas: "2000000",
+      });
+    // console.log(`mediator - debtor contract: transferred`);
 
-    //transfer debt between debtor and mediator
-
-    //transfer debt between mediator and creditor
-
+    // transfer debt between mediator and creditor
+    let mediatorCreditorContract = await this.checkIfContractExists(
+      this.props.profile,
+      this.props.exchange.debtRotation.creditor,
+      this.props.exchange.debtRotation.mediator
+    );
+    // console.log(`mediator - creditor contract: ${mediatorCreditorContract}`);
+    await mediatorCreditorContract.methods
+      .addTransaction(
+        this.props.exchange.debtRotation.mediator,
+        this.props.exchange.debtRotation.amount,
+        this.props.exchange.debtRotation.creditor
+      )
+      .send({
+        from: accounts[0],
+        gas: "2000000",
+      });
+    // console.log(`mediator - creditor contract: transferred`);
+    // console.log(isContract._address);
     //remove rotation exchanges
+    await this.props.profile.methods
+      .confirmDebtRotationRequest(this.props.index)
+      .send({
+        from: accounts[0],
+        gas: "2000000",
+      });
+    await debtorsProfile.methods
+      .confirmDebtRotationRequestNotRestricted(
+        debtorsIndex,
+        isContract._address
+      )
+      .send({
+        from: accounts[0],
+        gas: "2000000",
+      });
+    await creditorsProfile.methods
+      .confirmDebtRotationRequestNotRestricted(
+        creditorsIndex,
+        isContract._address
+      )
+      .send({
+        from: accounts[0],
+        gas: "2000000",
+      });
   };
   //********************************************************
   // ROTATION NON MEDIATOR PARTICIPANTS
@@ -134,6 +235,7 @@ export class RotationRequest extends Component {
   findParticipantsExchangeIndex = async (address) => {
     const profile = new web3.eth.Contract(profileAbi, address);
     const addresses = await profile.methods.getAllExchanges().call();
+    // console.log(addresses.length);
     for (var index = 0; index < addresses.length; index++) {
       let exchange = await profile.methods.getAllExchangesByIndex(index).call();
       if (
@@ -144,12 +246,15 @@ export class RotationRequest extends Component {
         this.props.exchange.debtRotation.mediator ===
           exchange.debtRotation.mediator &&
         this.props.exchange.debtRotation.amount === exchange.debtRotation.amount
-      )
+      ) {
+        // console.log(`succeeded finding index: ${index}`);
         return index;
+      }
     }
   };
   //  SEND A ROTATION EXCHANGE
   sendRotationRequestSingle = async (profile, index, accounts) => {
+    // console.log(`inside sendRotationRequestSingle`);
     await profile.methods
       .addDebtRotationRequestNotRestricted(
         this.props.exchange.debtRotation.mediator,
@@ -159,7 +264,7 @@ export class RotationRequest extends Component {
         this.state.statusToSend,
         index
       )
-      .send({ from: accounts[0], gas: "1000000" });
+      .send({ from: accounts[0], gas: "3000000" });
   };
   // CONFIRM REQUEST
   confirmRotationRequest = async () => {
@@ -176,12 +281,15 @@ export class RotationRequest extends Component {
     let mediatorsIndex = await this.findParticipantsExchangeIndex(
       this.props.exchange.debtRotation.mediator
     );
-    // console.log(mediatorsIndex);
+    // console.log(`mediators index: ${mediatorsIndex}`);
     let otherParticipantsIndex = await this.findParticipantsExchangeIndex(
       this.state.addressToGetIndexFrom
     );
-    // console.log(otherParticipantsIndex);
+    // console.log(`other index: ${otherParticipantsIndex}`);
 
+    // console.log(
+    //   `profile: ${this.props.profile}, index: ${this.props.index}, accounts: ${accounts}`
+    // );
     await this.sendRotationRequestSingle(
       this.props.profile,
       this.props.index,
@@ -200,7 +308,7 @@ export class RotationRequest extends Component {
   };
 
   render() {
-    console.log(this);
+    // console.log(this);
     const headerMessage = this.state.isMediator
       ? "You requested a rotation with:"
       : `${this.props.exchange.debtRotation.mediator} requested a rotation`;
@@ -208,8 +316,12 @@ export class RotationRequest extends Component {
     //PROGRESS STATUS
     //********************************************************
     const progress = [];
+    let iconsAmount =
+      this.props.exchange.debtRotation.status === "2"
+        ? "1"
+        : this.props.exchange.debtRotation.status;
     for (let index = 0; index <= 2; index++) {
-      if (index <= parseInt(this.props.exchange.debtRotation.status)) {
+      if (index <= parseInt(iconsAmount)) {
         progress.push(
           <CCol key={index} xs="4">
             <Brightness1TwoToneIcon
@@ -245,7 +357,7 @@ export class RotationRequest extends Component {
           size="sm"
           color="secondary"
           className="buttons_inside_contract_list"
-          // onClick={this.confirmFriendRequest}
+          onClick={this.mediatorsFinalAccept}
         >
           confirm
         </CButton>
