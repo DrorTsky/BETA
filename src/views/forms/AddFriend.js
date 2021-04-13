@@ -143,7 +143,7 @@ export class AddFriend extends Component {
   }
 
   render() {
-    console.log(this);
+    // console.log(this);
     return (
       <div>
         <CCard>
