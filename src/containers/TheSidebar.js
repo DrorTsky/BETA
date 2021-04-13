@@ -46,7 +46,7 @@ const TheSidebar = (props) => {
         <CSidebarNavItem>
           <CCard>
             <CCardBody>
-              <h8 style={{ color: "black" }}>{props.address}</h8>
+              <h6 style={{ color: "black" }}>{props.address}</h6>
             </CCardBody>
           </CCard>
         </CSidebarNavItem>
