@@ -11,8 +11,15 @@ import { icons } from "./assets/icons";
 
 import { Provider } from "react-redux";
 import store from "./store";
-
+// import app from "firebase/app";
 React.icons = icons;
+
+// FIREBASE RELATED
+// require("firebase/database");
+// const { firebaseConfig } = require("./firebaseConfig");
+// app.initializeApp(firebaseConfig);
+// var database = app.database();
+// console.log(database);
 
 ReactDOM.render(
   <Provider store={store}>

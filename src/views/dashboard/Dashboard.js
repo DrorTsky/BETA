@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import fireApp from "firebase/app";
 
 import AddDebt from "../forms/AddDebt";
 import AddFriend from "../forms/AddFriend";
@@ -26,20 +27,14 @@ import {
 import CIcon from "@coreui/icons-react";
 import Exchanges from "../requests/Exchanges";
 
-// const playerOne = "0x007f874C67735af8e8D8e5d9CfFD85850adBb22D";
+// FIREBASE RELATED
+require("firebase/database");
+const { firebaseConfig } = require("../../firebaseConfig");
+fireApp.initializeApp(firebaseConfig);
+var database = fireApp.database();
 
-// I make then 2 different variables as I try to make these 2 different scenarios detailed as possible.
-// In our frontend these 2 variables will be the same one
-// const address = playerOne;
+//...................................................................................................................
 
-// For testing purposes only!
-// const playerTwo = "0xE6123F02ebc3528f29F23E79797744B88a0Cb851";
-
-// const name = "test_name";
-
-// const compiledBinaryContract = require("../../solidity/build/BinaryContract.json");
-
-// const profile = new web3.eth.Contract(profileAbi, playerOne);
 // **************************** */
 
 // const WidgetsDropdown = lazy(() => import("../widgets/WidgetsDropdown.js"));
@@ -76,7 +71,54 @@ export class Dashboard extends Component {
     this.onSubmitConfirmDebtRequest = this.onSubmitConfirmDebtRequest.bind(
       this
     );
+    this.writeUserData = this.writeUserData.bind(this);
+    this.readUserData = this.readUserData.bind(this);
+    this.getAddressFromPhoneNumber = this.getAddressFromPhoneNumber.bind(this);
   }
+
+  //FIREBASE FUNCTIONS
+  writeUserData(phoneNumber, name, address) {
+    database
+      .ref("users/" + phoneNumber)
+      .set({
+        username: name,
+        contractAddress: address,
+      })
+      .then(() => database.goOffline());
+  }
+
+  readUserData = async (phoneNumber) => {
+    var address;
+    await database
+      .ref()
+      .child("users")
+      .child(phoneNumber)
+      .get()
+      .then(function (snapshot) {
+        if (snapshot.exists()) {
+          address = snapshot.val();
+        } else {
+          address = -1;
+        }
+      })
+      .catch(function (error) {
+        address = -1;
+      })
+      .then(() => database.goOffline());
+    console.log(address);
+    return address;
+  };
+
+  getAddressFromPhoneNumber = async (phoneNumber) => {
+    var address = await this.readUserData(phoneNumber);
+    console.log(address);
+    if (address === -1) {
+      console.log("The address was not found!");
+    }
+    // assert.notStrictEqual(-1, address, "The address was not found!");
+    console.log(address.contractAddress);
+    return address.contractAddress;
+  };
 
   async componentDidMount() {
     // console.log(this.state.friendsList);
@@ -87,7 +129,7 @@ export class Dashboard extends Component {
     // this.onCheckMyExchanges();
     this.onCheckMyContracts();
     this.onCheckMyFriends();
-    // console.log(this.props);
+    console.log(this);
   }
 
   // *****************************************************
@@ -607,6 +649,35 @@ export class Dashboard extends Component {
               profile={this.state.profile}
               compiledBinaryContract={this.props.compiledBinaryContract}
             />
+          </CCol>
+        </CRow>
+        <CRow>
+          <CCol xs="4" md="8" xl="8">
+            <button
+              onClick={() => {
+                this.writeUserData("0547307181", "dror", this.props.playerOne);
+              }}
+            >
+              add name
+            </button>
+          </CCol>
+          <CCol xs="4" md="8" xl="8">
+            <button
+              onClick={() => {
+                this.readUserData("0547307181");
+              }}
+            >
+              find user
+            </button>
+          </CCol>
+          <CCol xs="4" md="8" xl="8">
+            <button
+              onClick={() => {
+                this.getAddressFromPhoneNumber("0547307181");
+              }}
+            >
+              get address
+            </button>
           </CCol>
         </CRow>
         {/* <CRow>

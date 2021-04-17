@@ -28,6 +28,8 @@ const TheContent = (props) => {
   const compiledBinaryContract = props.compiledBinaryContract;
   const address = props.address;
 
+  // console.log(props);
+
   return (
     <main className="c-main" style={{ paddingTop: "1rem" }}>
       <CContainer fluid>
