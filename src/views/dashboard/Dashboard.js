@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import fireApp from "firebase/app";
+// import fireApp from "firebase/app";
 
 import AddDebt from "../forms/AddDebt";
 import AddFriend from "../forms/AddFriend";
@@ -27,11 +27,11 @@ import {
 import CIcon from "@coreui/icons-react";
 import Exchanges from "../requests/Exchanges";
 
-// FIREBASE RELATED
-require("firebase/database");
-const { firebaseConfig } = require("../../firebaseConfig");
-fireApp.initializeApp(firebaseConfig);
-var database = fireApp.database();
+// // FIREBASE RELATED
+// require("firebase/database");
+// const { firebaseConfig } = require("../../firebaseConfig");
+// fireApp.initializeApp(firebaseConfig);
+// var database = fireApp.database();
 
 //...................................................................................................................
 
@@ -71,54 +71,54 @@ export class Dashboard extends Component {
     this.onSubmitConfirmDebtRequest = this.onSubmitConfirmDebtRequest.bind(
       this
     );
-    this.writeUserData = this.writeUserData.bind(this);
-    this.readUserData = this.readUserData.bind(this);
-    this.getAddressFromPhoneNumber = this.getAddressFromPhoneNumber.bind(this);
+    // this.writeUserData = this.writeUserData.bind(this);
+    // this.readUserData = this.readUserData.bind(this);
+    // this.getAddressFromPhoneNumber = this.getAddressFromPhoneNumber.bind(this);
   }
 
-  //FIREBASE FUNCTIONS
-  writeUserData(phoneNumber, name, address) {
-    database
-      .ref("users/" + phoneNumber)
-      .set({
-        username: name,
-        contractAddress: address,
-      })
-      .then(() => database.goOffline());
-  }
+  // //FIREBASE FUNCTIONS
+  // writeUserData(phoneNumber, name, address) {
+  //   database
+  //     .ref("users/" + phoneNumber)
+  //     .set({
+  //       username: name,
+  //       contractAddress: address,
+  //     })
+  //     .then(() => database.goOffline());
+  // }
 
-  readUserData = async (phoneNumber) => {
-    var address;
-    await database
-      .ref()
-      .child("users")
-      .child(phoneNumber)
-      .get()
-      .then(function (snapshot) {
-        if (snapshot.exists()) {
-          address = snapshot.val();
-        } else {
-          address = -1;
-        }
-      })
-      .catch(function (error) {
-        address = -1;
-      })
-      .then(() => database.goOffline());
-    console.log(address);
-    return address;
-  };
+  // readUserData = async (phoneNumber) => {
+  //   var address;
+  //   await database
+  //     .ref()
+  //     .child("users")
+  //     .child(phoneNumber)
+  //     .get()
+  //     .then(function (snapshot) {
+  //       if (snapshot.exists()) {
+  //         address = snapshot.val();
+  //       } else {
+  //         address = -1;
+  //       }
+  //     })
+  //     .catch(function (error) {
+  //       address = -1;
+  //     })
+  //     .then(() => database.goOffline());
+  //   console.log(address);
+  //   return address;
+  // };
 
-  getAddressFromPhoneNumber = async (phoneNumber) => {
-    var address = await this.readUserData(phoneNumber);
-    console.log(address);
-    if (address === -1) {
-      console.log("The address was not found!");
-    }
-    // assert.notStrictEqual(-1, address, "The address was not found!");
-    console.log(address.contractAddress);
-    return address.contractAddress;
-  };
+  // getAddressFromPhoneNumber = async (phoneNumber) => {
+  //   var address = await this.readUserData(phoneNumber);
+  //   console.log(address);
+  //   if (address === -1) {
+  //     console.log("The address was not found!");
+  //   }
+  //   // assert.notStrictEqual(-1, address, "The address was not found!");
+  //   console.log(address.contractAddress);
+  //   return address.contractAddress;
+  // };
 
   async componentDidMount() {
     // console.log(this.state.friendsList);
@@ -651,7 +651,7 @@ export class Dashboard extends Component {
             />
           </CCol>
         </CRow>
-        <CRow>
+        {/* <CRow>
           <CCol xs="4" md="8" xl="8">
             <button
               onClick={() => {
@@ -679,7 +679,7 @@ export class Dashboard extends Component {
               get address
             </button>
           </CCol>
-        </CRow>
+        </CRow> */}
         {/* <CRow>
           <CCol xs="12" md="4">
             <AddFriend

@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import { TheContent, TheSidebar, TheFooter, TheHeader } from "./index";
+import Login from "../views/pages/login/Login";
+
+import fireApp from "firebase/app";
 
 // SOL RELATED
 import web3 from "../web3.js";
@@ -12,13 +15,19 @@ const playerOne = "0xc59dBCe5D155D3Ef59D7393996a5252604BF6eF0";
 const address = playerOne;
 
 // For testing purposes only!
-const playerTwo = "0xE6123F02ebc3528f29F23E79797744B88a0Cb851";
+// const playerTwo = "0xE6123F02ebc3528f29F23E79797744B88a0Cb851";
 
 const name = "test_name";
 
 const compiledBinaryContract = require("../solidity/build/BinaryContract.json");
 
 const profile = new web3.eth.Contract(profileAbi, playerOne);
+
+// FIREBASE RELATED
+require("firebase/database");
+const { firebaseConfig } = require("../firebaseConfig");
+fireApp.initializeApp(firebaseConfig);
+var database = fireApp.database();
 
 export class TheLayout extends Component {
   constructor(props) {
@@ -28,25 +37,97 @@ export class TheLayout extends Component {
       exchangesBrokenData: [],
       allExchanges: [],
       totalRequests: 0,
+      isLoggedIn: false,
+      NotRegisteredMessage: "",
+      userAddress: "",
+      userName: "",
+      profile: "",
     };
     this.setStateAndAmountOfExchanges = this.setStateAndAmountOfExchanges.bind(
       this
     );
+    this.writeUserData = this.writeUserData.bind(this);
+    this.readUserData = this.readUserData.bind(this);
+    this.getAddressFromPhoneNumber = this.getAddressFromPhoneNumber.bind(this);
+    this.isLoggedInCheck = this.isLoggedInCheck.bind(this);
   }
 
   async componentDidMount() {
-    if ((await profile.methods.getAllExchanges().call())[0] !== undefined) {
-      var exchange = {};
-      Promise.resolve(
-        (exchange = (await profile.methods.getAllExchanges().call())[0]
-          .transaction)
-      ).then(this.setStateAndAmountOfExchanges());
+    if (this.state.profile !== "") {
+      if (
+        (await this.state.profile.methods.getAllExchanges().call())[0] !==
+        undefined
+      ) {
+        var exchange = {};
+        Promise.resolve(
+          (exchange = (
+            await this.state.profile.methods.getAllExchanges().call()
+          )[0].transaction)
+        ).then(this.setStateAndAmountOfExchanges());
+      }
     }
   }
 
+  //FIREBASE FUNCTIONS
+  writeUserData = (phoneNumber, name, address) => {
+    database.ref("users/" + phoneNumber).set({
+      username: name,
+      contractAddress: address,
+    });
+  };
+
+  readUserData = async (phoneNumber) => {
+    var address;
+    await database
+      .ref()
+      .child("users")
+      .child(phoneNumber)
+      .get()
+      .then(function (snapshot) {
+        if (snapshot.exists()) {
+          address = snapshot.val();
+        } else {
+          address = -1;
+        }
+      })
+      .catch(function (error) {
+        address = -1;
+      });
+    return address;
+  };
+
+  getAddressFromPhoneNumber = async (phoneNumber) => {
+    var address = await this.readUserData(phoneNumber);
+    console.log(address);
+    if (address === -1) {
+      console.log("The address was not found!");
+    }
+    console.log(address.contractAddress);
+    return address.contractAddress;
+  };
+
+  isLoggedInCheck = async (phoneNumber) => {
+    console.log("checking user");
+    var check = await this.readUserData(phoneNumber);
+    if (check !== -1) {
+      this.props.setUsername(check.username);
+      this.props.setUserAddress(check.contractAddress);
+      this.setState({
+        isLoggedIn: true,
+        profile: new web3.eth.Contract(profileAbi, this.props.userAddress),
+        // userAddress: check.contractAddress,
+        // userName: check.username,
+      });
+    } else {
+      this.setState({ NotRegisteredMessage: "no such user" });
+    }
+  };
+
   setStateAndAmountOfExchanges = async () => {
     this.setState({
-      exchangesBrokenData: await profile.methods.getAllExchanges().call(),
+      exchangesBrokenData: await this.state.profile.methods
+        .getAllExchanges()
+        .call(),
     });
     this.setState({
       totalRequests: this.state.exchangesBrokenData.length,
@@ -56,7 +137,9 @@ export class TheLayout extends Component {
         this.setState({
           allExchanges: [
             ...this.state.allExchanges,
-            await profile.methods.getAllExchangesByIndex(index).call(),
+            await this.state.profile.methods
+              .getAllExchangesByIndex(index)
+              .call(),
           ],
         });
       }
@@ -64,73 +147,46 @@ export class TheLayout extends Component {
   };
 
   render() {
-    // console.log(this.state);
-    return (
+    var main = [];
+    main = this.state.isLoggedIn ? (
       <div className="c-app c-default-layout">
         <TheSidebar
-          playerOne={playerOne}
-          playerTwo={playerTwo}
-          profile={profile}
+          playerOne={this.props.userAddress}
+          profile={this.state.profile}
           name={name}
           compiledBinaryContract={compiledBinaryContract}
-          address={address}
+          address={this.props.userAddress}
         />
         <div className="c-wrapper">
           <TheHeader
-            profile={profile}
+            profile={this.state.profile}
             compiledBinaryContract={compiledBinaryContract}
             allExchanges={this.state.allExchanges}
             totalRequests={this.state.totalRequests}
           />
           <div className="c-body">
             <TheContent
-              playerOne={playerOne}
-              playerTwo={playerTwo}
-              profile={profile}
+              playerOne={this.props.userAddress}
+              profile={this.state.profile}
               compiledBinaryContract={compiledBinaryContract}
-              address={playerOne}
+              address={this.props.userAddress}
               name={name}
             />
           </div>
-          <TheFooter />
+          <TheFooter isLoggedInCheck={this.isLoggedInCheck} />
         </div>
       </div>
+    ) : (
+      <Login
+        NotRegisteredMessage={this.state.NotRegisteredMessage}
+        isLoggedInCheck={this.isLoggedInCheck}
+        writeUserData={this.writeUserData}
+        compiledBinaryContract={compiledBinaryContract}
+      />
     );
+    console.log(this);
+    return <>{main}</>;
   }
 }
 
 export default TheLayout;
-
-// const TheLayout = () => {
-//   return (
-//     <div className="c-app c-default-layout">
-//       <TheSidebar
-//         playerOne={playerOne}
-//         playerTwo={playerTwo}
-//         profile={profile}
-//         name={name}
-//         compiledBinaryContract={compiledBinaryContract}
-//         address={address}
-//       />
-//       <div className="c-wrapper">
-//         <TheHeader
-//           profile={profile}
-//           compiledBinaryContract={compiledBinaryContract}
-//         />
-//         <div className="c-body">
-//           <TheContent
-//             playerOne={playerOne}
-//             playerTwo={playerTwo}
-//             profile={profile}
-//             compiledBinaryContract={compiledBinaryContract}
-//             address={playerOne}
-//             name={name}
-//           />
-//         </div>
-//         <TheFooter />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default TheLayout;
