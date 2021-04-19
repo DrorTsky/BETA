@@ -75,9 +75,9 @@ export class AmountToRotateRotationDialog extends Component {
     //   debtRequestType.debtRotationRequest
     // );
     // console.log(lastDebtRotationRequestIndex);
-    console.log(
-      `${this.props.mediatorAddress} , ${this.props.selectedCreditor.friendsAddress}, ${this.props.selectedDebtor.friendsAddress}, ${this.state.amountToRotate}`
-    );
+    // console.log(
+    //   `${this.props.mediatorAddress} , ${this.props.selectedCreditor.friendsAddress}, ${this.props.selectedDebtor.friendsAddress}, ${this.state.amountToRotate}`
+    // );
 
     await this.props.profile.methods
       .addDebtRotationRequestNotRestricted(
@@ -130,7 +130,7 @@ export class AmountToRotateRotationDialog extends Component {
   }
 
   render() {
-    console.log(this);
+    // console.log(this);
     return (
       <div>
         <CCard>
