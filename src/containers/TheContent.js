@@ -20,6 +20,7 @@ export class TheContent extends Component {
   }
 
   render() {
+    this.props.setStateAndAmountOfExchanges();
     return (
       <main className="c-main" style={{ paddingTop: "1rem" }}>
         <CContainer fluid>

@@ -72,6 +72,9 @@ export class Exchanges extends Component {
               compiledBinaryContract={this.props.compiledBinaryContract}
               playerOne={this.props.playerOne}
               index={exchange[0]}
+              setStateAndAmountOfExchanges={
+                this.props.setStateAndAmountOfExchanges
+              }
             />
           );
         }

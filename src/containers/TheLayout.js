@@ -143,6 +143,7 @@ export class TheLayout extends Component {
     this.setState({
       totalRequests: this.state.exchangesBrokenData.length,
     });
+    this.setState({ allExchanges: [] });
     if (this.state.totalRequests > 0) {
       for (var index = 0; index < this.state.totalRequests; index++) {
         this.setState({
@@ -169,6 +170,7 @@ export class TheLayout extends Component {
           address={this.state.userAddress}
           getAddressFromPhoneNumber={this.getAddressFromPhoneNumber}
           getFriendFromPhoneNumber={this.getFriendFromPhoneNumber}
+          setStateAndAmountOfExchanges={this.setStateAndAmountOfExchanges}
         />
         <div className="c-wrapper">
           <TheHeader
@@ -187,6 +189,7 @@ export class TheLayout extends Component {
               name={this.state.userName}
               getAddressFromPhoneNumber={this.getAddressFromPhoneNumber}
               getFriendFromPhoneNumber={this.getFriendFromPhoneNumber}
+              setStateAndAmountOfExchanges={this.setStateAndAmountOfExchanges}
             />
           </div>
           <TheFooter isLoggedInCheck={this.isLoggedInCheck} />
