@@ -8,20 +8,20 @@ import fireApp from "firebase/app";
 import web3 from "../web3.js";
 import profileAbi from "../profile";
 
-const playerOne = "0xc59dBCe5D155D3Ef59D7393996a5252604BF6eF0";
+// const playerOne = "0xc59dBCe5D155D3Ef59D7393996a5252604BF6eF0";
 
 // I make then 2 different variables as I try to make these 2 different scenarios detailed as possible.
 // In our frontend these 2 variables will be the same one
-const address = playerOne;
+// const address = playerOne;
 
 // For testing purposes only!
 // const playerTwo = "0xE6123F02ebc3528f29F23E79797744B88a0Cb851";
 
-const name = "test_name";
+// const name = "test_name";
 
 const compiledBinaryContract = require("../solidity/build/BinaryContract.json");
 
-const profile = new web3.eth.Contract(profileAbi, playerOne);
+// const profile = new web3.eth.Contract(profileAbi, playerOne);
 
 // FIREBASE RELATED
 require("firebase/database");
@@ -50,6 +50,7 @@ export class TheLayout extends Component {
     this.readUserData = this.readUserData.bind(this);
     this.getAddressFromPhoneNumber = this.getAddressFromPhoneNumber.bind(this);
     this.isLoggedInCheck = this.isLoggedInCheck.bind(this);
+    this.getFriendFromPhoneNumber = this.getFriendFromPhoneNumber.bind(this);
   }
 
   async componentDidMount() {
@@ -96,6 +97,15 @@ export class TheLayout extends Component {
     return address;
   };
 
+  getFriendFromPhoneNumber = async (phoneNumber) => {
+    var friend = await this.readUserData(phoneNumber);
+    if (friend === -1) {
+      console.log("The friend was not found!");
+    }
+    console.log(friend);
+    return friend;
+  };
+
   getAddressFromPhoneNumber = async (phoneNumber) => {
     var address = await this.readUserData(phoneNumber);
     console.log(address);
@@ -110,13 +120,14 @@ export class TheLayout extends Component {
     console.log("checking user");
     var check = await this.readUserData(phoneNumber);
     if (check !== -1) {
-      this.props.setUsername(check.username);
-      this.props.setUserAddress(check.contractAddress);
+      console.log(`the name is ${check.username}`);
+      // this.props.setUsername(check.username);
+      // this.props.setUserAddress(check.contractAddress);
       this.setState({
         isLoggedIn: true,
-        profile: new web3.eth.Contract(profileAbi, this.props.userAddress),
-        // userAddress: check.contractAddress,
-        // userName: check.username,
+        profile: new web3.eth.Contract(profileAbi, check.contractAddress),
+        userAddress: check.contractAddress,
+        userName: check.username,
       });
     } else {
       this.setState({ NotRegisteredMessage: "no such user" });
@@ -151,11 +162,13 @@ export class TheLayout extends Component {
     main = this.state.isLoggedIn ? (
       <div className="c-app c-default-layout">
         <TheSidebar
-          playerOne={this.props.userAddress}
+          playerOne={this.state.userAddress}
           profile={this.state.profile}
-          name={name}
+          name={this.state.userName}
           compiledBinaryContract={compiledBinaryContract}
-          address={this.props.userAddress}
+          address={this.state.userAddress}
+          getAddressFromPhoneNumber={this.getAddressFromPhoneNumber}
+          getFriendFromPhoneNumber={this.getFriendFromPhoneNumber}
         />
         <div className="c-wrapper">
           <TheHeader
@@ -163,14 +176,17 @@ export class TheLayout extends Component {
             compiledBinaryContract={compiledBinaryContract}
             allExchanges={this.state.allExchanges}
             totalRequests={this.state.totalRequests}
+            getAddressFromPhoneNumber={this.getAddressFromPhoneNumber}
           />
           <div className="c-body">
             <TheContent
-              playerOne={this.props.userAddress}
+              playerOne={this.state.userAddress}
               profile={this.state.profile}
               compiledBinaryContract={compiledBinaryContract}
-              address={this.props.userAddress}
-              name={name}
+              address={this.state.userAddress}
+              name={this.state.userName}
+              getAddressFromPhoneNumber={this.getAddressFromPhoneNumber}
+              getFriendFromPhoneNumber={this.getFriendFromPhoneNumber}
             />
           </div>
           <TheFooter isLoggedInCheck={this.isLoggedInCheck} />

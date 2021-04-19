@@ -162,8 +162,8 @@ export class FriendRequest extends Component {
         </div>
       );
     } else {
-      topMessage = "from: " + this.props.sourceName;
-      bodyMessage = this.props.sourceName + " sent you a friend request";
+      topMessage = "from: " + this.props.destinationName;
+      bodyMessage = this.props.destinationName + " sent you a friend request";
       buttons.push(
         <div>
           <CButton

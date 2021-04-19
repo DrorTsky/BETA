@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import web3 from "../../web3.js";
+import profileAbi from "../../profile";
 
 //CORE-UI
 import { CButton, CCard, CCardBody, CCardHeader, CLink } from "@coreui/react";
@@ -26,12 +28,20 @@ export class Contract extends Component {
       debt: props.debt,
       openTransactionLog: false,
       openAddDebt: false,
+      friendsName: "",
+      friendsAddress: "",
     };
 
     this.handleOpenTransactionLog = this.handleOpenTransactionLog.bind(this);
     this.handleCloseTransactionLog = this.handleCloseTransactionLog.bind(this);
     this.handleOpenAddDebt = this.handleOpenAddDebt.bind(this);
     this.handleCloseAddDebt = this.handleCloseAddDebt.bind(this);
+    this.getNameFromAddress = this.getNameFromAddress.bind(this);
+  }
+
+  componentDidMount() {
+    this.getNameFromAddress();
+    console.log(this.props.allTransactions);
   }
 
   handleOpenTransactionLog = () => {
@@ -56,13 +66,24 @@ export class Contract extends Component {
     });
   };
 
+  getNameFromAddress = async () => {
+    const friendsAddress =
+      this.props.debtor === this.props.playerOne
+        ? this.props.creditor
+        : this.props.debtor;
+    this.setState({ friendsAddress: friendsAddress });
+    let friendsProfile = new web3.eth.Contract(profileAbi, friendsAddress);
+    this.setState({
+      friendsName: await friendsProfile.methods.getName().call(),
+    });
+  };
+
   render() {
-    // console.log(this.state);
+    // console.log(this);
     let headerName =
       this.state.myName === this.state.creditor
-        ? this.state.debtor
-        : this.state.creditor;
-
+        ? this.props.myName
+        : this.state.friendsName;
     let message = "";
     let cardTextStyle = "";
     if (this.state.typeOfCard === "danger") {
@@ -117,8 +138,10 @@ export class Contract extends Component {
                 </DialogTitle>
                 <DialogContent>
                   <TransactionLog
-                    myAddress={this.state.myName}
+                    myName={this.state.myName}
+                    myAddress={this.props.address}
                     allTransactions={this.state.allTransactions}
+                    friendsName={this.state.friendsName}
                   />
                 </DialogContent>
               </Dialog>
@@ -142,7 +165,7 @@ export class Contract extends Component {
                 <DialogContent>
                   <AddDebt
                     {...this.props}
-                    friendAddress={headerName}
+                    friendAddress={this.state.friendsAddress}
                     handleClose={this.handleCloseAddDebt}
                   />
                 </DialogContent>

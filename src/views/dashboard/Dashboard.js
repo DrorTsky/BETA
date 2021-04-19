@@ -638,6 +638,7 @@ export class Dashboard extends Component {
   // *****************************************************
 
   render() {
+    // console.log(this);
     return (
       <>
         <CRow>
@@ -648,6 +649,7 @@ export class Dashboard extends Component {
               playerTwo={this.state.playerTwo}
               profile={this.state.profile}
               compiledBinaryContract={this.props.compiledBinaryContract}
+              myName={this.props.name}
             />
           </CCol>
         </CRow>

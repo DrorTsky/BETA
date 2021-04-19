@@ -35,6 +35,9 @@ export class RotationRequest extends Component {
       isCreditor: false,
       statusToSend: "0",
       addressToGetIndexFrom: "",
+      mediatorName: "",
+      creditorName: "",
+      debtorName: "",
     };
     this.findParticipantsExchangeIndex = this.findParticipantsExchangeIndex.bind(
       this
@@ -43,9 +46,10 @@ export class RotationRequest extends Component {
     this.sendRotationRequestSingle = this.sendRotationRequestSingle.bind(this);
     this.mediatorsFinalAccept = this.mediatorsFinalAccept.bind(this);
     this.checkIfContractExists = this.checkIfContractExists.bind(this);
+    this.setNames = this.setNames.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     if (this.props.playerOne === this.props.exchange.debtRotation.mediator) {
       this.setState({ isMediator: true });
     } else if (
@@ -63,7 +67,28 @@ export class RotationRequest extends Component {
         addressToGetIndexFrom: this.props.exchange.debtRotation.creditor,
       });
     }
+    await this.setNames();
   }
+  setNames = async () => {
+    let mediatorProfile = new web3.eth.Contract(
+      profileAbi,
+      this.props.exchange.debtRotation.mediator
+    );
+    let creditorProfile = new web3.eth.Contract(
+      profileAbi,
+      this.props.exchange.debtRotation.creditor
+    );
+    let debtorProfile = new web3.eth.Contract(
+      profileAbi,
+      this.props.exchange.debtRotation.debtor
+    );
+    this.setState({
+      mediatorName: await mediatorProfile.methods.getName().call(),
+      creditorName: await creditorProfile.methods.getName().call(),
+      debtorName: await debtorProfile.methods.getName().call(),
+    });
+  };
+
   //********************************************************
   // MEDIATORS ACCEPT
   //********************************************************
@@ -311,7 +336,7 @@ export class RotationRequest extends Component {
     // console.log(this);
     const headerMessage = this.state.isMediator
       ? "You requested a rotation with:"
-      : `${this.props.exchange.debtRotation.mediator} requested a rotation`;
+      : `${this.state.mediatorName} requested a rotation`;
     //********************************************************
     //PROGRESS STATUS
     //********************************************************
@@ -402,9 +427,9 @@ export class RotationRequest extends Component {
           <CCardHeader>{headerMessage}</CCardHeader>
           <CCardBody>
             <blockquote className="card-bodyquote">
-              <h6>{this.props.exchange.debtRotation.creditor}</h6>
-              <br />
-              <h6>{this.props.exchange.debtRotation.debtor}</h6>
+              <h6>
+                {this.state.creditorName} and {this.state.debtorName}
+              </h6>
               <br />
               <h3>for: {this.props.exchange.debtRotation.amount}</h3>
               {this.props.creationDate}
@@ -415,7 +440,6 @@ export class RotationRequest extends Component {
               </CCardBody>
             </CCard>
             <footer className="footer_contract_list_element">{buttons}</footer>
-            <button onClick={this.mediatorsFinalAccept}>test</button>
           </CCardBody>
         </CCard>
       </div>

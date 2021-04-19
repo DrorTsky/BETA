@@ -83,7 +83,7 @@ export class AllContracts extends Component {
       items.push(
         <Contract
           key={index}
-          myName={this.props.playerOne}
+          myAddress={this.props.playerOne}
           {...this.props}
           {...value}
         />

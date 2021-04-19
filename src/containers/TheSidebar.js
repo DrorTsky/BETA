@@ -22,9 +22,9 @@ import navigation from "./_nav";
 const TheSidebar = (props) => {
   const dispatch = useDispatch();
   const show = useSelector((state) => state.sidebarShow);
-  // useEffect(() => {
-  //   console.log(props);
-  // });
+  useEffect(() => {
+    console.log(props);
+  });
   return (
     <CSidebar
       show={show}
@@ -47,6 +47,11 @@ const TheSidebar = (props) => {
           <CCard>
             <CCardBody>
               <h6 style={{ color: "black" }}>{props.address}</h6>
+              {props.name === "" ? (
+                <h6 style={{ color: "black" }}>no name</h6>
+              ) : (
+                <h6 style={{ color: "black" }}>{props.name}</h6>
+              )}
             </CCardBody>
           </CCard>
         </CSidebarNavItem>

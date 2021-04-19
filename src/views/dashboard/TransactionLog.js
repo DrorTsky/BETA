@@ -13,13 +13,20 @@ export class TransactionLog extends Component {
   }
 
   render() {
+    // console.log(this);
     const items = [];
     for (const [index, value] of Object.entries(this.state.allTransactions)) {
+      console.log(value);
       items.push(
-        <Transaction key={index} myAddress={this.props.myAddress} {...value} />
+        <Transaction
+          key={index}
+          myName={this.props.myName}
+          myAddress={this.props.myAddress}
+          friendsName={this.props.friendsName}
+          {...value}
+        />
       );
     }
-    // console.log(items);
     return (
       <div>
         <CCard>

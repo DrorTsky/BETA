@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import web3 from "../../web3.js";
+import profileAbi from "../../profile";
 //CORE-UI
 import {
   CCol,
@@ -51,10 +52,10 @@ export class ChooseFriendsForRotationRequest extends Component {
       this
     );
     // this.onCheckMyContracts = this.onCheckMyContracts.bind(this);
+    this.getNameFromAddress = this.getNameFromAddress.bind(this);
   }
 
   //////////////////////////////////////////////////////////////////////////////////////
-
   // Getting my contracts
   onCheckMyContracts = async () => {
     this.setState({
@@ -101,10 +102,12 @@ export class ChooseFriendsForRotationRequest extends Component {
       }
 
       // create list of contract information
+      let name = await this.getNameFromAddress(friendsAddress);
       let binaryContractInstance = {
         friendsAddress: friendsAddress,
         debt: debtAmount,
         isInDebt: isInDebt,
+        name: name,
       };
       if (binaryContractInstance.isInDebt === "danger") {
         let newListInformation = {
@@ -128,6 +131,11 @@ export class ChooseFriendsForRotationRequest extends Component {
     }
   };
   //////////////////////////////////////////////////////////////////////////////////////
+
+  getNameFromAddress = async (friendsAddress) => {
+    let friendsProfile = new web3.eth.Contract(profileAbi, friendsAddress);
+    return await friendsProfile.methods.getName().call();
+  };
 
   async componentDidMount() {
     // console.log(this.state.friendsList);
@@ -159,13 +167,13 @@ export class ChooseFriendsForRotationRequest extends Component {
   };
 
   render() {
-    console.log(this);
+    // console.log(this);
 
     const peopleOweToUser = [];
     const peopleUserOwesTo = [];
 
     for (const [index, value] of Object.entries(this.state.peopleOweToUser)) {
-      console.log(this.state.peopleOweToUser);
+      // console.log(this.state.peopleOweToUser);
       peopleOweToUser.push(
         <CListGroupItem
           accent="success"
@@ -179,7 +187,7 @@ export class ChooseFriendsForRotationRequest extends Component {
           style={{ borderTopWidth: "2px" }}
           onClick={this.debtorSelected(index)}
         >
-          {value.friendsAddress}:<br /> <b>{value.debt}</b>
+          {value.name}:<br /> <b>{value.debt}</b>
         </CListGroupItem>
       );
     }
@@ -197,11 +205,7 @@ export class ChooseFriendsForRotationRequest extends Component {
           style={{ borderTopWidth: "2px" }}
           onClick={this.creditorSelected(index)}
         >
-          {/* <CCard style={{ marginBottom: "0px" }}>
-            <CCardHeader>{value.debt}</CCardHeader>
-            <CCardBody>{value.friendsAddress}</CCardBody>
-          </CCard> */}
-          {value.friendsAddress}:<br /> <b>{value.debt}</b>
+          {value.name}:<br /> <b>{value.debt}</b>
         </CListGroupItem>
       );
     }

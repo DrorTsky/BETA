@@ -21,10 +21,7 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      username: "",
-      userAddress: "",
-    };
+    this.state = {};
   }
 
   render() {
@@ -59,19 +56,7 @@ class App extends Component {
             <Route
               path="/"
               name="Home"
-              render={(props) => (
-                <TheLayout
-                  {...props}
-                  username={this.state.username}
-                  setUsername={(name) => {
-                    this.setState({ username: name });
-                  }}
-                  userAddress={this.state.userAddress}
-                  setUserAddress={(address) => {
-                    this.setState({ userAddress: address });
-                  }}
-                />
-              )}
+              render={(props) => <TheLayout {...props} />}
             />
           </Switch>
         </React.Suspense>

@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import web3 from "../../web3.js";
+import profileAbi from "../../profile";
 //CORE-UI
 import { CButton } from "@coreui/react";
 //MATERIAL-UI
@@ -13,13 +15,17 @@ export class Friend extends Component {
 
     this.state = {
       friendAddress: this.props.friendAddress,
-      friendName: this.props.friendName,
+      friendName: "",
       openAddDebt: false,
     };
     this.handleOpenAddDebt = this.handleOpenAddDebt.bind(this);
     this.handleCloseAddDebt = this.handleCloseAddDebt.bind(this);
+    this.getNameFromAddress = this.getNameFromAddress.bind(this);
   }
 
+  componentDidMount() {
+    this.getNameFromAddress();
+  }
   // Add debt state related
   handleOpenAddDebt = () => {
     this.setState({ openAddDebt: true });
@@ -27,7 +33,18 @@ export class Friend extends Component {
   handleCloseAddDebt = () => {
     this.setState({ openAddDebt: false });
   };
+
+  getNameFromAddress = async () => {
+    let friendsProfile = new web3.eth.Contract(
+      profileAbi,
+      this.props.friendAddress
+    );
+    this.setState({
+      friendName: await friendsProfile.methods.getName().call(),
+    });
+  };
   render() {
+    // console.log(this);
     return (
       <div>
         <CButton

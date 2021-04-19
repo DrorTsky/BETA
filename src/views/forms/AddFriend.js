@@ -22,8 +22,6 @@ import CIcon from "@coreui/icons-react";
 import web3 from "../../web3.js";
 import profileAbi from "../../profile";
 
-const name = "test_name";
-
 export class AddFriend extends Component {
   constructor(props) {
     super(props);
@@ -31,10 +29,10 @@ export class AddFriend extends Component {
     this.state = {
       playerOne: this.props.playerOne,
       address: this.props.playerOne,
-      friendsAddress: this.props.playerTwo,
+      phoneNumber: "",
       profile: this.props.profile,
       friendsList: [],
-      friend: [],
+      // friend: [],
       allFriends: [],
     };
     this.addFriendFormSubmit = this.addFriendFormSubmit.bind(this);
@@ -92,24 +90,34 @@ export class AddFriend extends Component {
 
   addFriend = async () => {
     const accounts = await web3.eth.getAccounts();
+
+    const friend = await this.props.getFriendFromPhoneNumber(
+      this.state.phoneNumber
+    );
+    console.log(friend);
+    const friendsAddress = friend.contractAddress;
+    // const friendsAddress = await this.props.getAddressFromPhoneNumber(
+    //   this.state.phoneNumber
+    // );
+    // console.log(friendsAddress);
+
     // Getting accounts list
     // Getting a reference to a friendsProfile - NOTE: it will work only if the user provided us friendsProfile address
-    const friendsProfile = new web3.eth.Contract(
-      profileAbi,
-      this.state.friendsAddress
-    );
+    const friendsProfile = new web3.eth.Contract(profileAbi, friendsAddress);
+
+    console.log(friendsProfile);
 
     // NOTE: that's how I convert between a batch request and 2 seperate "send" requests:
-
+    const friendsName = friend.username;
+    console.log(`friends name: ${friendsName}`);
+    console.log(`my name: ${this.props.name}`);
     makeBatchRequest([
       // add both of the exchanges in a batch request.
-      this.state.profile.methods.addFriendRequest(
-        this.state.friendsAddress,
-        name
-      ).send,
+      this.state.profile.methods.addFriendRequest(friendsAddress, friendsName)
+        .send,
       friendsProfile.methods.addFriendRequestNotRestricted(
         this.state.address,
-        name
+        this.props.name
       ).send,
     ]);
     function makeBatchRequest(calls) {
@@ -165,9 +173,9 @@ export class AddFriend extends Component {
                     </CInputGroupPrepend>
                     <CInput
                       id="input1-group1"
-                      name="friendsAddress"
-                      placeholder="Username"
-                      value={this.state.friendsAddress}
+                      name="phoneNumber"
+                      placeholder="Phone number"
+                      value={this.state.phoneNumber}
                       onChange={this.onChangeFormInput}
                     />
                   </CInputGroup>

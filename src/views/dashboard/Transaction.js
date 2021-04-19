@@ -5,21 +5,26 @@ export class Transaction extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      from: props.from,
-      to: props.to,
-      amount: props.amount,
-      myAddress: props.myAddress,
-    };
+    this.state = {};
   }
 
   render() {
-    let typeOfCard =
-      this.state.to === this.state.myAddress ? "success" : "danger";
+    // console.log(this);
+    let typeOfCard, message;
+    if (this.props.to === this.props.myAddress) {
+      typeOfCard = "success";
+      message = `${this.props.amount} || From: ${this.props.myName}, To:
+          ${this.props.friendsName}`;
+    } else {
+      typeOfCard = "danger";
+      message = `${this.props.amount} || From: ${this.props.friendsName}, To:
+          ${this.props.myName}`;
+    }
+
     return (
       <div>
         <CListGroupItem accent={typeOfCard} color={typeOfCard}>
-          {this.state.amount} || From: {this.state.from}, To:{this.state.to}
+          {message}
         </CListGroupItem>
       </div>
     );

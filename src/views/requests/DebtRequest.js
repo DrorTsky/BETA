@@ -7,14 +7,20 @@ export class DebtRequest extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      friendsName: "",
+    };
     this.confirmDebtRequest = this.confirmDebtRequest.bind(this);
     this.declineDebtRequest = this.declineDebtRequest.bind(this);
     this.findParticipantsExchangeIndex = this.findParticipantsExchangeIndex.bind(
       this
     );
+    this.getNameFromAddress = this.getNameFromAddress.bind(this);
   }
 
+  componentDidMount() {
+    this.getNameFromAddress();
+  }
   // FIND EXCHANGE INDEX
   findParticipantsExchangeIndex = async (address) => {
     const profile = new web3.eth.Contract(profileAbi, address);
@@ -158,6 +164,17 @@ export class DebtRequest extends Component {
     }
   };
 
+  getNameFromAddress = async () => {
+    const friendsAddress =
+      this.props.exchange.transaction.from === this.props.playerOne
+        ? this.props.exchange.transaction.to
+        : this.props.exchange.transaction.from;
+    let friendsProfile = new web3.eth.Contract(profileAbi, friendsAddress);
+    this.setState({
+      friendsName: await friendsProfile.methods.getName().call(),
+    });
+  };
+
   declineDebtRequest = async (event) => {
     event.preventDefault();
 
@@ -227,7 +244,7 @@ export class DebtRequest extends Component {
     if (this.props.playerOne === this.props.source) {
       topMessage = "pending...";
       bodyMessage =
-        "you sent " + this.props.destinationName + " " + this.props.amount;
+        "you sent " + this.state.friendsName + " " + this.props.amount;
       buttons.push(
         <div>
           <CButton
@@ -241,8 +258,8 @@ export class DebtRequest extends Component {
         </div>
       );
     } else {
-      topMessage = "from: " + this.props.sourceName;
-      bodyMessage = this.props.sourceName + " payed you: " + this.props.amount;
+      topMessage = "from: " + this.state.friendsName;
+      bodyMessage = this.state.friendsName + " payed you: " + this.props.amount;
       buttons.push(
         <div>
           <CButton

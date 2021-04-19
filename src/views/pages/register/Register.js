@@ -57,6 +57,9 @@ export class Register extends Component {
       newContract.options.address
     );
     console.log("finished");
+    this.setState({
+      redirect: true,
+    });
   };
 
   deployAProfileContract = async (profileContractName) => {
@@ -96,57 +99,57 @@ export class Register extends Component {
             <CCol md="9" lg="7" xl="6">
               <CCard className="mx-4">
                 <CCardBody className="p-4">
-                  <CForm
+                  {/* <CForm
                     // action="/register"
                     // method="post"
                     onSubmit={this.deploy}
+                  > */}
+                  <h1>Register</h1>
+                  <p className="text-muted">Create your account</p>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupPrepend>
+                      <CInputGroupText>
+                        <CIcon name="cil-user" />
+                      </CInputGroupText>
+                    </CInputGroupPrepend>
+                    <CInput
+                      id="userName"
+                      name="username"
+                      type="text"
+                      placeholder="Username"
+                      autoComplete="off"
+                      onChange={this.onChangeFormInput}
+                      required
+                    />
+                  </CInputGroup>
+                  <CInputGroup className="mb-3">
+                    <CInputGroupPrepend>
+                      <CInputGroupText>
+                        <CIcon name="cil-phone" />
+                      </CInputGroupText>
+                    </CInputGroupPrepend>
+                    <CInput
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      type="text"
+                      placeholder="Phone number"
+                      autoComplete="off"
+                      onChange={this.onChangeFormInput}
+                      required
+                    />
+                  </CInputGroup>
+                  <CButton
+                    color="success"
+                    block
+                    onClick={this.deploy}
+                    // type="submit"
                   >
-                    <h1>Register</h1>
-                    <p className="text-muted">Create your account</p>
-                    <CInputGroup className="mb-3">
-                      <CInputGroupPrepend>
-                        <CInputGroupText>
-                          <CIcon name="cil-user" />
-                        </CInputGroupText>
-                      </CInputGroupPrepend>
-                      <CInput
-                        id="userName"
-                        name="username"
-                        type="text"
-                        placeholder="Username"
-                        autoComplete="off"
-                        onChange={this.onChangeFormInput}
-                        required
-                      />
-                    </CInputGroup>
-                    <CInputGroup className="mb-3">
-                      <CInputGroupPrepend>
-                        <CInputGroupText>
-                          <CIcon name="cil-phone" />
-                        </CInputGroupText>
-                      </CInputGroupPrepend>
-                      <CInput
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        type="text"
-                        placeholder="Phone number"
-                        autoComplete="off"
-                        onChange={this.onChangeFormInput}
-                        required
-                      />
-                    </CInputGroup>
-                    <CButton
-                      color="success"
-                      block
-                      // onClick={this.onSubmitRegister}
-                      type="submit"
-                    >
-                      Create Account
-                    </CButton>
-                    <CButton color="secondary" block to="/">
-                      Already have an account?
-                    </CButton>
-                  </CForm>
+                    Create Account
+                  </CButton>
+                  <CButton color="secondary" block to="/">
+                    Already have an account?
+                  </CButton>
+                  {/* </CForm> */}
                 </CCardBody>
               </CCard>
             </CCol>

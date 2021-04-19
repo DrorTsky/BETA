@@ -55,9 +55,10 @@ export class ChooseFriendForDebtRequest extends Component {
   render() {
     const friends = [];
     const amountOfFriends = this.state.friendsList.length;
-    console.log(this.state.allFriends);
+    // console.log(this.state.allFriends);
 
     for (const [index, value] of Object.entries(this.state.allFriends)) {
+      // console.log(value);
       friends.push(
         <Friend
           key={index}
@@ -68,9 +69,8 @@ export class ChooseFriendForDebtRequest extends Component {
         />
       );
     }
-
     const isFriendsListEmpty = this.state.friendsList.length;
-    console.log(this.state.allFriends);
+
     return (
       <div>
         <CCol xs="12" md="4">
