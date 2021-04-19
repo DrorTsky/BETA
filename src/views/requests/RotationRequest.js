@@ -46,6 +46,7 @@ export class RotationRequest extends Component {
     this.sendRotationRequestSingle = this.sendRotationRequestSingle.bind(this);
     this.mediatorsFinalAccept = this.mediatorsFinalAccept.bind(this);
     this.checkIfContractExists = this.checkIfContractExists.bind(this);
+    this.declineRotationRequest = this.declineRotationRequest.bind(this);
     this.setNames = this.setNames.bind(this);
   }
 
@@ -332,8 +333,80 @@ export class RotationRequest extends Component {
     ); //third and final participant
   };
 
+  declineRotationRequest = async (event) => {
+    event.preventDefault();
+    console.log("in decline");
+    //getting users account
+    const accounts = await web3.eth.getAccounts();
+
+    const addresses = [
+      this.props.exchange.debtRotation.creditor,
+      this.props.exchange.debtRotation.debtor,
+      this.props.exchange.debtRotation.mediator,
+    ];
+    console.log(addresses);
+
+    let forBatchRequests = [];
+    addresses.map(async (address) => {
+      console.log(address);
+      if (address !== this.props.playerOne) {
+        let friendsProfile = new web3.eth.Contract(profileAbi, address);
+        let friendsExchangeIndex = -1;
+        let friendsExchanges = await friendsProfile.methods
+          .getAllExchanges()
+          .call();
+        let length = friendsExchanges.length;
+        if (length > 0) {
+          for (var friendsIndex = 0; friendsIndex < length; friendsIndex++) {
+            let exchange = await friendsProfile.methods
+              .getAllExchangesByIndex(friendsIndex)
+              .call();
+            if (
+              exchange.exchangePurpose ===
+                this.props.exchange.exchangePurpose &&
+              exchange.transaction.date === this.props.exchange.transaction.date
+            ) {
+              friendsExchangeIndex = friendsIndex;
+            }
+          }
+        }
+        forBatchRequests.push(
+          friendsProfile.methods.removeExchange(friendsExchangeIndex).send
+        );
+      }
+      forBatchRequests.push(
+        this.props.profile.methods.removeExchange(this.props.index).send
+      );
+
+      // BATCH
+      // if (friendsExchangeIndex !== -1) {
+      makeBatchRequest(forBatchRequests);
+      // }
+      function makeBatchRequest(calls) {
+        let batch = new web3.BatchRequest();
+
+        calls.map((call) => {
+          return new Promise((res, rej) => {
+            let req = call.request(
+              { from: accounts[0], gas: "3000000" },
+              (err, data) => {
+                if (err) rej(err);
+                else res(data);
+              }
+            );
+            batch.add(req);
+          });
+        });
+        batch.execute();
+      }
+    });
+    // for (let address in addresses) {
+
+    // }
+  };
+
   render() {
-    // console.log(this);
+    console.log(this);
     const headerMessage = this.state.isMediator
       ? "You requested a rotation with:"
       : `${this.state.mediatorName} requested a rotation`;
@@ -413,7 +486,7 @@ export class RotationRequest extends Component {
               size="sm"
               color="dark"
               className="buttons_inside_contract_list"
-              // onClick={this.confirmFriendRequest}
+              onClick={this.declineRotationRequest}
             >
               refuse
             </CButton>
