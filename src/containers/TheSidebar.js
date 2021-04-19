@@ -22,9 +22,9 @@ import navigation from "./_nav";
 const TheSidebar = (props) => {
   const dispatch = useDispatch();
   const show = useSelector((state) => state.sidebarShow);
-  useEffect(() => {
-    console.log(props);
-  });
+  // useEffect(() => {
+  //   console.log(props);
+  // });
   return (
     <CSidebar
       show={show}

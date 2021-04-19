@@ -16,7 +16,7 @@ export class TransactionLog extends Component {
     // console.log(this);
     const items = [];
     for (const [index, value] of Object.entries(this.state.allTransactions)) {
-      console.log(value);
+      // console.log(value);
       items.push(
         <Transaction
           key={index}

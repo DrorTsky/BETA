@@ -200,7 +200,7 @@ export class TheLayout extends Component {
         compiledBinaryContract={compiledBinaryContract}
       />
     );
-    console.log(this);
+    // console.log(this);
     return <>{main}</>;
   }
 }

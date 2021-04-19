@@ -41,7 +41,7 @@ export class Contract extends Component {
 
   componentDidMount() {
     this.getNameFromAddress();
-    console.log(this.props.allTransactions);
+    // console.log(this.props.allTransactions);
   }
 
   handleOpenTransactionLog = () => {
